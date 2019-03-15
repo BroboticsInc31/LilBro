@@ -1,10 +1,3 @@
-#!usr/bin/python
-# -----------------------------------
-# A PID controller port to python of the Arduino PID Library by Brett Beauregard
-#
-# Eric Sanchez 7-16-18
-# -----------------------------------
-
 from __future__ import division
 import time
 import odrive
