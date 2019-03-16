@@ -32,6 +32,7 @@ print("Initial velocity limit is ",lilbro.driver1.axis0.controller.config.vel_li
 
 while True:
     try:
+      # this is a Test for Updating through collabEdit
       #  pos1 = lilbro.getCounts()
       #  print("D1: ",lilbro.getDriver1())
       #  print("Positions: ",lilbro.getCounts())
@@ -51,5 +52,3 @@ while True:
 
         lilbro.setState(1)
         sys.exit()
-
-
