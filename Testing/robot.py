@@ -21,13 +21,6 @@ class robot():
         self.driver1 = 0
         self.driver2 = 0
 
-
-    # # * Compute() **********************************************************************
-    # *     This, as they say, is where the magic happens.  this function should be called
-    # *   every time "void loop()" executes.  the function will decide for itself whether a new
-    # *   pid Output needs to be computed.  returns true when the output is computed,
-    # *   false when nothing has been done.
-    # **********************************************************************************
     def findDrivers(self, driverID1, driverID2):
         self.driver1 = odrive.find_any("usb",str(driverID1))
         self.driver2 = odrive.find_any("usb",str(driverID2))
@@ -45,6 +38,52 @@ class robot():
 
         self.driver2.axis0.requested_state = state
         self.driver2.axis1.requested_state = state
+
+    def setGain(self,newGain):
+        self.driver1.axis0.controller.config.pos_gain = newGain
+        self.driver1.axis1.controller.config.pos_gain = newGain
+
+        self.driver2.axis0.controller.config.pos_gain = newGain
+        self.driver2.axis1.controller.config.pos_gain = newGain
+
+    def addGain(self,incGain):
+        self.driver1.axis0.controller.config.pos_gain += incGain
+        self.driver1.axis1.controller.config.pos_gain += incGain
+
+        self.driver2.axis0.controller.config.pos_gain += incGain
+        self.driver2.axis1.controller.config.pos_gain += incGain
+
+    def isError(self):
+        if (self.driver1.axis0.error != 0 or self.driver1.axis0.error != 0 or self.driver2.axis0.error != 0 or self.driver2.axis1.error != 0):
+            return 1
+        else:
+            return 0
+
+    def setVelLim(self,velLim):
+        self.driver1.axis0.controller.config.vel_limit = velLim
+        self.driver1.axis1.controller.config.vel_limit = velLim
+
+        self.driver2.axis0.controller.config.vel_limit = velLim
+        self.driver2.axis1.controller.config.vel_limit = velLim
+
+    def setCurLim(self,curLim):
+        self.driver1.axis0.motor.config.current_lim = curLim
+        self.driver1.axis1.motor.config.current_lim = curLim
+
+        self.driver2.axis0.motor.config.current_lim = curLim
+        self.driver2.axis1.motor.config.current_lim = curLim
+
+    def getCounts(self):
+        return [self.driver1.axis0.encoder.pos_estimate,self.driver1.axis1.encoder.pos_estimate,self.driver2.axis0.encoder.pos_estimate,self.driver2.axis1.encoder.pos_estimate];
+        
+    def getCurrents(self):
+        return [self.driver1.axis0.motor.current_control.Iq_measured,self.driver1.axis1.motor.current_control.Iq_measured,self.driver2.axis0.motor.current_control.Iq_measured,self.driver2.axis1.motor.current_control.Iq_measured];
+
+  #  def writeToFile(self,param)
+  #      startTime = time.time()
+  #      motorPos = self.getCounts()
+
+  #      np.savetxt('startSequence.txt',np.c_[array2,array3],fmt="%.3f %.3f")
 
     # * SetTunings(...)*************************************************************
     # * This function allows the controller's dynamic performance to be adjusted.
