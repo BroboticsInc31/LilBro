@@ -1,3 +1,13 @@
+#!usr/bin/python
+# -----------------------------------
+# An Odrive class used to control lil'Bro; an open source quadrupedal robot for UTSA's Robotics and Motion Laboratory
+# 
+#
+# @authors Steven Farra, Emiliano Rodriguez 
+# @version 1.0
+# @since 2019-03-11
+# -----------------------------------
+
 from __future__ import division
 import time
 import odrive
@@ -12,7 +22,16 @@ import numpy as np
 #P_ON_E = 1
 
 class robot():
+    """This is the constructor for the robot class.
 
+    In this constructor, the proportional gain, current limit,
+    velocity limit, and drivers are initialized and delclared.
+
+    @params self
+    @return Unused
+
+    """
+    
     def __init__(self):
 
         self.pGain = 20
@@ -21,6 +40,16 @@ class robot():
         self.driver1 = 0
         self.driver2 = 0
 
+     """ findDrivers finds Odrive motor drivers given their serial number in main class
+
+    This method uses the Serial number of an odrive motor driver that is 
+    connected via USB. 
+    
+    @params driverID1,driverID2 
+    @return Unused
+
+    """
+    
     def findDrivers(self, driverID1, driverID2):
         self.driver1 = odrive.find_any("usb",str(driverID1))
         self.driver2 = odrive.find_any("usb",str(driverID2))
