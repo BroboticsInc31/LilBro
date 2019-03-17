@@ -41,9 +41,12 @@ class robot():
         self.driver1 = 0
         self.driver2 = 0
 
-        global timeArray = []
-        global motorPos = []
-        global motor1 = []
+        global timeArray
+        timeArray = []
+        global motorPos
+        motorPos = []
+        global motor1
+        motor1 = []
     
     """ findDrivers finds Odrive motor drivers given their serial number in main class
 
@@ -116,12 +119,12 @@ class robot():
     def getBusVoltage(self):
         return [self.driver1.vbus_voltage,self.driver2.vbus_voltage];
 
-    def writeToFile(self,saved)
+    def writeToFile(self,saved):
         if(globals.dataOn == 1):
             motorPos = self.getCounts()
             timeArray.append(time.time() - globals.startTime)
             motor1.append(motorPos[0])
-        else(globals.dataOn == 0 and saved == 0):
+        elif(globals.dataOn == 0 and saved == 0):
             np.savetxt('ClassPositions.txt',np.c_[timeArray,motor1],fmt="%.3f %.3f")
             saved = 1
 

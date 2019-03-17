@@ -5,6 +5,7 @@
 import os, struct, array
 from fcntl import ioctl
 import globals 
+import time as time_
 
 class control():
 
@@ -175,7 +176,7 @@ class control():
                     if(dataFlag == 1):
                         print("Now writing to positions file.");
                         globals.dataOn = 1
-                        globals.startTime = time.time() 
+                        globals.startTime = time_.time() 
                     elif(dataFlag == -1):
                         print("Writing to file is complete.")
                         globals.dataOn = 0
