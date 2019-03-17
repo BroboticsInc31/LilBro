@@ -79,9 +79,12 @@ class robot():
     def getCurrents(self):
         return [self.driver1.axis0.motor.current_control.Iq_measured,self.driver1.axis1.motor.current_control.Iq_measured,self.driver2.axis0.motor.current_control.Iq_measured,self.driver2.axis1.motor.current_control.Iq_measured];
 
-  #  def writeToFile(self,param)
-  #      startTime = time.time()
-  #      motorPos = self.getCounts()
+    def getBusVoltage(self):
+        return [self.driver1.vbus_voltage,self.driver2.vbus_voltage];
+
+  #    def writeToFile(self)
+  #        startTime = time.time()
+  #        motorPos = self.getCounts()
 
   #      np.savetxt('startSequence.txt',np.c_[array2,array3],fmt="%.3f %.3f")
 
