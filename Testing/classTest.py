@@ -19,6 +19,8 @@ import globals
 #drive1 is top right driver
 #drive2 is bottom right driver
 
+saveVar = 0
+
 globals.initialize()
 lilbro = robot.robot()
 ctrl = control.control()
@@ -32,18 +34,20 @@ readJSThrd = threading.Thread(target=ctrl.ctrl)
 readJSThrd.daemon = True
 readJSThrd.start()
 
-while(globals.mode == 0):
-  print("In loop ",globals.reqState)
-  if(globals.reqState == 8):
-    lilbro.setState(globals.reqState)
-    globals.mode = 1
-    break
+#while(globals.mode == 0):
+#  print("In loop ",globals.reqState)
+#  if(globals.reqState == 8):
+#    lilbro.setState(globals.reqState)
+#    globals.mode = 1
+#    break
 
 while True:
     try:
         print("Error: ",lilbro.isError())
 
-        time.sleep(1.5)
+        lilbro.writeToFile(saveVar)
+
+        time.sleep(1)
 
     except (KeyboardInterrupt):
         # Turn off the motors

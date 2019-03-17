@@ -116,13 +116,14 @@ class robot():
     def getBusVoltage(self):
         return [self.driver1.vbus_voltage,self.driver2.vbus_voltage];
 
-    def writeToFile(self)
-        motorPos = self.getCounts()
-        timeArray.append(time.time() - globals.startTime)
-        motor1.append(motorPos[1])
-        if (globals.dataOn == 0):
+    def writeToFile(self,saved)
+        if(globals.dataOn == 1):
+            motorPos = self.getCounts()
+            timeArray.append(time.time() - globals.startTime)
+            motor1.append(motorPos[0])
+        else(globals.dataOn == 0 and saved == 0):
             np.savetxt('ClassPositions.txt',np.c_[timeArray,motor1],fmt="%.3f %.3f")
-
+            saved = 1
 
     #    def writeToFile(self)
   #        startTime = time.time()
