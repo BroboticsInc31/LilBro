@@ -4,3 +4,5 @@ def initialize():
     global mode
     mode = 0
 
+    global dataOn = 0
+    global startTime = 0

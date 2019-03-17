@@ -13,6 +13,7 @@ import time
 import odrive
 import math
 import numpy as np
+import globals
 
 #AUTOMATIC  = 1
 #MANUAL = 0
@@ -31,7 +32,7 @@ class robot():
     @return Unused
 
     """
-    
+
     def __init__(self):
 
         self.pGain = 20
@@ -40,7 +41,11 @@ class robot():
         self.driver1 = 0
         self.driver2 = 0
 
-     """ findDrivers finds Odrive motor drivers given their serial number in main class
+        global timeArray = []
+        global motorPos = []
+        global motor1 = []
+    
+    """ findDrivers finds Odrive motor drivers given their serial number in main class
 
     This method uses the Serial number of an odrive motor driver that is 
     connected via USB. 
@@ -49,7 +54,7 @@ class robot():
     @return Unused
 
     """
-    
+
     def findDrivers(self, driverID1, driverID2):
         self.driver1 = odrive.find_any("usb",str(driverID1))
         self.driver2 = odrive.find_any("usb",str(driverID2))
@@ -111,12 +116,20 @@ class robot():
     def getBusVoltage(self):
         return [self.driver1.vbus_voltage,self.driver2.vbus_voltage];
 
-  #    def writeToFile(self)
+    def writeToFile(self)
+        motorPos = self.getCounts()
+        timeArray.append(time.time() - globals.startTime)
+        motor1.append(motorPos[1])
+        if (globals.dataOn == 0):
+            np.savetxt('ClassPositions.txt',np.c_[timeArray,motor1],fmt="%.3f %.3f")
+
+
+    #    def writeToFile(self)
   #        startTime = time.time()
   #        motorPos = self.getCounts()
 
   #      np.savetxt('startSequence.txt',np.c_[array2,array3],fmt="%.3f %.3f")
-
+  
     # * SetTunings(...)*************************************************************
     # * This function allows the controller's dynamic performance to be adjusted.
     # * it's called automatically from the constructor, but tunings can also

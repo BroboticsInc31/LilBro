@@ -13,35 +13,34 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import robot
+import control
+import globals
 
 #drive1 is top right driver
 #drive2 is bottom right driver
 
+globals.initialize()
 lilbro = robot.robot()
+ctrl = control.control()
 
 print("Finding an ODrive...")
 #my_drive1 = odrive.find_any("usb","206237793548")
 #my_drive2 = odrive.find_any("usb","388937803437")
 lilbro.findDrivers(206237793548,388937803437)
 
-print("Initial gain is ", lilbro.driver1.axis0.controller.config.pos_gain)
-lilbro.setVelLim(60000)
-lilbro.setState(8)
+readJSThrd = threading.Thread(target=ctrl.ctrl)
+readJSThrd.daemon = True
+readJSThrd.start()
 
-print("Initial velocity limit is ",lilbro.driver1.axis0.controller.config.vel_limit)
+while(globals.mode == 0):
+  print("In loop ",globals.reqState)
+  if(globals.reqState == 8):
+    lilbro.setState(globals.reqState)
+    globals.mode = 1
+    break
 
 while True:
     try:
-      # this is a Test for Updating through collabEdit
-      #  pos1 = lilbro.getCounts()
-      #  print("D1: ",lilbro.getDriver1())
-      #  print("Positions: ",lilbro.getCounts())
-      #  print("Motor Pos1 = ", pos1[1])
-      #  print("Motor currents: ",lilbro.getCurrents())
-        
-#        lilbro.setGain(50)
-#        print("Gain is ", lilbro.driver1.axis0.controller.config.pos_gain)
-
         print("Error: ",lilbro.isError())
 
         time.sleep(1.5)

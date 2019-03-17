@@ -13,14 +13,11 @@ class control():
     def __init__(self):
         print("initialized controller class")
 
-
-    def findDrivers(self, driverID1, driverID2):
-        self.driver1 = odrive.find_any("usb",str(driverID1))
-        self.driver2 = odrive.find_any("usb",str(driverID2))
-        now = time.time()
-
     def ctrl(self):
-        flag = 1 
+
+        flag = 1
+        dataFlag = 1
+
         # Iterate over the joystick devices.
         print('Available devices:')
 
@@ -174,6 +171,16 @@ class control():
                     print("requested State = 1")
                     globals.reqState = 1 
 
+                if button_states['tr']:
+                    if(dataFlag == 1):
+                        print("Now writing to positions file.");
+                        globals.dataOn = 1
+                        globals.startTime = time.time() 
+                    elif(dataFlag == -1):
+                        print("Writing to file is complete.")
+                        globals.dataOn = 0
+                    dataFlag = dataFlag*-1
+
                 if button_states['tl']:
                     if(flag == 1):
                         print("mode = 1");
@@ -181,7 +188,7 @@ class control():
                     elif(flag == -1):
                         print("mode = 0")
                         globals.mode = 0
-                    flag = flag*-1    
+                    flag = flag*-1      
 
                 if button_states['b']:
                     print("requested State = 8")
