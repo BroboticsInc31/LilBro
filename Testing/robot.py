@@ -128,6 +128,18 @@ class robot():
             np.savetxt('ClassPositions.txt',np.c_[timeArray,motor1],fmt="%.3f %.3f")
             saved = 1
 
+    def toDeg(self,counts):
+        return 360*(counts)/8192
+
+    def toCount(self,degrees):
+        return 8192*(degrees)/360
+
+    def toLeg(self,counts):
+        return counts*(1/5)
+
+    def toMotor(self,counts):
+        return counts*5
+
     #    def writeToFile(self)
   #        startTime = time.time()
   #        motorPos = self.getCounts()
