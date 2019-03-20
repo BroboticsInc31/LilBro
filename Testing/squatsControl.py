@@ -29,7 +29,7 @@ array3 = []
 
 print("Finding an ODrive...")
 my_drive1 = odrive.find_any("usb","206237793548")
-my_drive2 = odrive.find_any("usb","388937803437")
+my_drive2 = odrive.find_any("usb","205637973548")
 
 inTime = 0
 print("Odrive found!")
@@ -195,10 +195,8 @@ def readJS():
     global strt
     global walkPath
     global start
-    global mapPos0
-    global mapPos1
-    mapPos0 = 3150
-    mapPos1 = -680
+    global mapPos
+    mapPos = -1650
     start = 0
     gain = 20
     strt = 0
@@ -272,6 +270,31 @@ def readJS():
 
             if button_states['start'] and (armed == False):
 
+                # Calibrate motor and wait for it to finish
+                if not my_drive1.axis0.motor.is_calibrated:
+                    print("Calibrating M0...")
+                    calibrating = True
+                    my_drive1.axis0.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
+
+                if not my_drive1.axis1.motor.is_calibrated:
+                    print("Calibrating M1...")
+                    calibrating = True
+                    my_drive1.axis1.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
+                    
+                if not my_drive2.axis0.motor.is_calibrated:
+                    print("Calibrating M0...")
+                    calibrating = True
+                    my_drive2.axis0.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
+
+                if not my_drive2.axis1.motor.is_calibrated:
+                    print("Calibrating M1...")
+                    calibrating = True
+                    my_drive2.axis1.requested_state = AXIS_STATE_FULL_CALIBRATION_SEQUENCE
+
+                if calibrating:
+                    while (my_drive1.axis0.current_state != AXIS_STATE_IDLE) or (my_drive1.axis1.current_state != AXIS_STATE_IDLE or my_drive2.axis0.current_state != AXIS_STATE_IDLE) or (my_drive2.axis1.current_state != AXIS_STATE_IDLE):
+                        time_.sleep(0.1)
+
                 my_drive1.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
                 my_drive1.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
                 my_drive1.axis0.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
@@ -282,6 +305,12 @@ def readJS():
                 my_drive2.axis0.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
                 my_drive2.axis1.controller.config.control_mode = CTRL_MODE_POSITION_CONTROL
                 
+                
+                my_drive1.axis0.controller.pos_setpoint = 0
+                my_drive1.axis1.controller.pos_setpoint = 0
+                
+                my_drive2.axis0.controller.pos_setpoint = 0
+                my_drive2.axis1.controller.pos_setpoint = 0
                 armed = True
 
                 print("Motors Armed!")
@@ -294,13 +323,14 @@ def readJS():
                 axis = axis_map[number]
                 if(axis == 'ry'):
                     fvalue = (value / 32767.0) + 1
-                    mapPos0 = enc_map(fvalue,2,0,2180,2650)
-                    mapPos1 = enc_map(fvalue,2,0,-1585,-1180)
+                    mapPos0 = enc_map(fvalue,2,0,-160,-1451)
+                    mapPos1 = enc_map(fvalue,2,0,3725,-2438)
                     trigValue = fvalue           
                     axis_states[axis] = fvalue
               #      print(trigValue," ",mapPos)
 
-               
+
+       
 # Start the readJS thread. Reads joystick in the "background"
 readJSThrd = threading.Thread(target=readJS)
 readJSThrd.daemon = True
@@ -311,31 +341,25 @@ readJSThrd.start()
 while True:
     # Allows ctrl-C to exit the program, should keep the IMU stable
     try:
-
-
-        if(walkPath == 1 and armed == True):
-            my_drive1.axis0.controller.pos_setpoint = mapPos0+200
+      
+        if(walkPath == 1):
+            my_drive1.axis0.controller.pos_setpoint = mapPos0
             my_drive1.axis1.controller.pos_setpoint = mapPos1
             my_drive1.axis0.controller.config.pos_gain = gain
             my_drive1.axis1.controller.config.pos_gain = gain
         
         
-            my_drive2.axis0.controller.pos_setpoint = mapPos0
-            my_drive2.axis1.controller.pos_setpoint = mapPos1
+            my_drive2.axis0.controller.pos_setpoint = mapPos
+            my_drive2.axis1.controller.pos_setpoint = mapPos
             my_drive2.axis0.controller.config.pos_gain = gain
             my_drive2.axis1.controller.config.pos_gain = gain
             
-           # print("[", my_drive1.axis0.encoder.pos_estimate, ", ", my_drive1.axis1.encoder.pos_estimate,"]", "[", my_drive2.axis0.encoder.pos_estimate, ", ", my_drive2.axis1.encoder.pos_estimate,"], Temp1: [ ",my_drive1.axis0.get_temp(),", ", my_drive1.axis1.get_temp(),"] . Temp2: [",my_drive2.axis0.get_temp()," , ", my_drive2.axis1.get_temp(),"]")
-           
-            print("[", my_drive1.axis0.motor.current_control.Iq_measured, ", ", my_drive1.axis1.motor.current_control.Iq_measured,"]", "[", my_drive2.axis0.motor.current_control.Iq_measured, ", ", my_drive2.axis1.motor.current_control.Iq_measured,"], Temp1: [ ",my_drive1.axis0.get_temp(),", ", my_drive1.axis1.get_temp(),"] . Temp2: [",my_drive2.axis0.get_temp()," , ", my_drive2.axis1.get_temp(),"]")
-
-           
+            print("[", my_drive1.axis0.encoder.pos_estimate, ", ", my_drive1.axis1.encoder.pos_estimate,"]", "[", my_drive2.axis0.encoder.pos_estimate, ", ", my_drive2.axis1.encoder.pos_estimate,"]")
             time_.sleep(0.05)
 
   
     except (KeyboardInterrupt):
         # Turn off the motors
-        armed = False
         my_drive1.axis0.requested_state = AXIS_STATE_IDLE
         my_drive1.axis1.requested_state = AXIS_STATE_IDLE
         my_drive2.axis0.requested_state = AXIS_STATE_IDLE
