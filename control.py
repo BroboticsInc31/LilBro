@@ -170,7 +170,7 @@ class control():
     
                 if button_states['a']:
                     print("requested State = 1")
-                    globals.reqState = 1 
+                    globals.reqState = 1
 
                 if button_states['tr']:
                     if(dataFlag == 1):
@@ -194,6 +194,14 @@ class control():
                 if button_states['b']:
                     print("requested State = 8")
                     globals.reqState = 8
+
+                if button_states['x']:
+                    print("Sweep On")
+                    globals.sweepOn = 1
+
+                if button_states['y']:
+                    print("Sweep Off")
+                    globals.sweepOn = 0
 
             if type & 0x02:
                 axis = axis_map[number]

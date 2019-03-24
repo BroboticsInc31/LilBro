@@ -8,3 +8,6 @@ def initialize():
     dataOn = 0
     global startTime
     startTime = 0
+
+    global sweepOn
+    sweepOn = 0
