@@ -29,16 +29,19 @@ ctrl = control.control()
 print("Finding an ODrive...")
 #my_drive1 = odrive.find_any("usb","206237793548")
 #my_drive2 = odrive.find_any("usb","388937803437")
-lilbro.findDrivers(206237793548,388937803437)
-lilbro.driver1 = odrive.find_any()
+#lilbro.findDrivers(206237793548,388937803437)
+driver1 = odrive.find_any()
+
+driver1.axis0.requested_state = 1
+driver1.axis1.requested_state = 1
 
 readJSThrd = threading.Thread(target=ctrl.ctrl)
 readJSThrd.daemon = True
 readJSThrd.start()
 
-testPos1 = lilbro.toMotor(toCount(30))
-posArray1 = np.linspace(0,testPos1,50)
-posArray2 = np.linspace(testPos1,0,50)
+testPos1 = lilbro.toMotor(lilbro.toCount(360))
+posArray1 = np.linspace(0,testPos1,150)
+posArray2 = np.linspace(testPos1,0,150)
 
 #while(globals.mode == 0):
 #  print("In loop ",globals.reqState)
@@ -47,21 +50,23 @@ posArray2 = np.linspace(testPos1,0,50)
 #    globals.mode = 1
 #    break
 print("Press O to Enter Closed Loop Mode")
-while(globals.reqState == 1):
+while(driver1.axis0.current_state != 8):
     if(globals.reqState == 8):
-        lilbro.driver1.axis0.requested_state = 8
-        lilbro.driver1.axis1.requested_state = 8
+        driver1.axis0.requested_state = globals.reqState
+        driver1.axis1.requested_state = globals.reqState
+        print("RAINBOW NIII")
+    print("Mode is ",driver1.axis0.current_state," ,",driver1.axis1.current_state)
     time.sleep(0.1)
 
 while True:
     try:
-        print("Error: ",lilbro.isError())
+#        print("Error: ",lilbro.isError())
 
-        lilbro.writeToFile(saveVar)
+#        lilbro.writeToFile(saveVar)
 
         if(globals.reqState == 1):
-            lilbro.driver1.axis0.requested_state = 1
-            lilbro.driver1.axis1.requested_state = 1
+            driver1.axis0.requested_state = 1
+            driver1.axis1.requested_state = 1
             globals.sweepOn = 0
 
         if(globals.sweepOn == 1 and globals.reqState == 8):
@@ -69,8 +74,8 @@ while True:
                 if(globals.sweepOn == 0 or globals.reqState == 1):
                     break
                 
-                lilbro.driver1.axis0.controller.pos_setpoint = posArray1[i]
-                lilbro.driver1.axis1.controller.pos_setpoint = posArray1[i]
+                driver1.axis0.controller.pos_setpoint = posArray1[i]
+                driver1.axis1.controller.pos_setpoint = posArray1[i]
 
                 time.sleep(0.01)
 
@@ -78,8 +83,8 @@ while True:
                 if(globals.sweepOn == 0 or globals.reqState == 1):
                     break
                 
-                lilbro.driver1.axis0.controller.pos_setpoint = posArray2[j]
-                lilbro.driver2.axis0.controller.pos_setpoint = posArray2[j]
+                driver1.axis0.controller.pos_setpoint = posArray2[j]
+                driver1.axis1.controller.pos_setpoint = posArray2[j]
 
                 time.sleep(0.01)
             
@@ -88,8 +93,8 @@ while True:
         # Turn off the motors
         # Close the data file
 
-        lilbro.driver1.axis0.requested_state = 1
-        lilbro.driver1.axis1.requested_state = 1
+        driver1.axis0.requested_state = 1
+        driver1.axis1.requested_state = 1
         
-        lilbro.setState(1)
+#        lilbro.setState(1)
         sys.exit()
