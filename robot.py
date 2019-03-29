@@ -176,7 +176,8 @@ class robot():
   
 
     def rotation(self,theta):
-        return R = np.array([[math.cos(math.radians(theta)),-math.sin(math.radians(theta))],[math.sin(math.radians(theta)),math.cos(math.radians(theta))]])
+        R = np.array([[math.cos(math.radians(theta)),-math.sin(math.radians(theta))],[math.sin(math.radians(theta)),math.cos(math.radians(theta))]])
+        return R
 
     def symmetric(self,alpha1,alpha2,l1,l2):
         base = [0,0]
