@@ -138,7 +138,7 @@ class robot():
         return [self.driver1.vbus_voltage,self.driver2.vbus_voltage];
 
     def getTemp(self):
-        return [self.driver1.axis0.get_temp(),self.driver1.axis1.get_temp(),self.driver2.axis0.get_temp()],self.driver2.axis1.get_temp()];
+        return [self.driver1.axis0.get_temp(),self.driver1.axis1.get_temp(),self.driver2.axis0.get_temp(),self.driver2.axis1.get_temp()];
 
 
     def writeToFile(self,saved):
