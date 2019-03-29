@@ -163,6 +163,9 @@ class robot():
     def toMotor(self,counts):
         return counts*5
 
+    def setPos(self,driver,pos):
+        driver.axis0.controller.pos_setpoint = pos
+        driver.axis1.controller.pos_setpoint = pos
 
     def takeStep(self,driver,pos):
         driver.axis0.controller.pos_setpoint = pos
@@ -171,11 +174,11 @@ class robot():
     def checkStep(self,driver,deg):
         if()
   
-  
+
     def rotation(self,theta):
         return R = np.array([[math.cos(math.radians(theta)),-math.sin(math.radians(theta))],[math.sin(math.radians(theta)),math.cos(math.radians(theta))]])
 
-    def symmetric(alpha1,alpha2,l1,l2):
+    def symmetric(self,alpha1,alpha2,l1,l2):
         base = [0,0]
         leftshoulder = np.array([l1*math.cos(math.radians(alpha2)),l1*math.sin(math.radians(alpha2))])
         rightshoulder = np.array([l1*math.cos(math.radians(alpha2)),-l1*math.sin(math.radians(alpha2))])
