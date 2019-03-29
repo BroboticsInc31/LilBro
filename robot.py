@@ -171,8 +171,8 @@ class robot():
         driver.axis0.controller.pos_setpoint = pos
         driver.axis1.controller.pos_setpoint = pos
 
-    def checkStep(self,driver,deg):
-        if()
+    # def checkStep(self,driver,deg):
+    #     if()
   
 
     def rotation(self,theta):
