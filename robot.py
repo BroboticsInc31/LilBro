@@ -176,16 +176,16 @@ class robot():
   
 
     def rotation(self,theta):
-        R = np.array([[math.cos(math.radians(theta)),-math.sin(math.radians(theta))],[math.sin(math.radians(theta)),math.cos(math.radians(theta))]])
+        R = np.array([[math.cos(theta),-math.sin(theta)],[math.sin(theta),math.cos(theta)]])
         return R
 
     def symmetric(self,alpha1,alpha2,l1,l2):
         base = [0,0]
-        leftshoulder = np.array([l1*math.cos(math.radians(alpha2)),l1*math.sin(math.radians(alpha2))])
-        rightshoulder = np.array([l1*math.cos(math.radians(alpha2)),-l1*math.sin(math.radians(alpha2))])
-        foot = np.array([l1*math.cos(math.radians(alpha2))+math.sqrt((l2**2)-(l1**2)*(math.sin(math.radians(alpha2)))**2),0])
+        leftshoulder = np.array([l1*math.cos(alpha2),l1*math.sin(alpha2)])
+        rightshoulder = np.array([l1*math.cos(alpha2),-l1*math.sin(alpha2)])
+        foot = np.array([l1*math.cos(alpha2)+math.sqrt((l2**2)-(l1**2)*(math.sin(alpha2))**2),0])
 
-        R = rotation(alpha1)
+        R = self.rotation(alpha1)
         leftshoulder = R.dot(leftshoulder)
         rightshoulder = R.dot(rightshoulder)
         foot = R.dot(foot)
