@@ -6,11 +6,10 @@ import os, struct, array
 from fcntl import ioctl
 import globals 
 import time as time_
+import robot as robort
 
 class control():
 
-    
-    
     def __init__(self):
         print("initialized controller class")
 
@@ -18,6 +17,8 @@ class control():
 
         flag = 1
         dataFlag = 1
+
+        armed = 0
 
         # Iterate over the joystick devices.
         print('Available devices:')
@@ -167,10 +168,16 @@ class control():
                         else:
                             print("%s released" % (button))
                 
-    
-                if button_states['a']:
-                    print("requested State = 1")
-                    globals.reqState = 1
+                if button_states['start'] and armed == 0:
+                    print("Motors Armed!")
+                    armed = 1
+                    robort.setStates(8)
+
+                if button_states['select'] and armed == 1:
+                    print("Motors Unarmed!")
+                    armed = 0
+                    robort.setStates(1)
+
 
                 if button_states['tr']:
                     if(dataFlag == 1):
@@ -191,17 +198,21 @@ class control():
                         globals.mode = 0
                     flag = flag*-1      
 
-                if button_states['b']:
-                    print("requested State = 8")
-                    globals.reqState = 8
-
-                if button_states['x']:
+                if button_states['y']:
                     print("Sweep On")
                     globals.sweepOn = 1
 
-                if button_states['y']:
+                if button_states['x']:
                     print("Sweep Off")
                     globals.sweepOn = 0
+
+                if button_states['dpad_up']:
+                    globals.gainInc += 10
+                    print('Gain is ',20 + globals.gainInc)
+
+                if button_states['dpad_down']:
+                    globals.gainInc -= 10
+                    print('Gain is ',20 + globals.gainInc)
 
             if type & 0x02:
                 axis = axis_map[number]

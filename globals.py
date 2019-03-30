@@ -11,3 +11,6 @@ def initialize():
 
     global sweepOn
     sweepOn = 0
+
+    global gainInc
+    gainInc = 0

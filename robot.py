@@ -88,6 +88,9 @@ class robot():
         self.setGain(self.driver1,newGain)
         self.setGain(self.driver2,newGain)
 
+    def getGains(self,driver):
+        return self.driver.axis0.controller.config.pos_gain;
+
     def addGain(self,incGain):
         self.driver1.axis0.controller.config.pos_gain += incGain
         self.driver1.axis1.controller.config.pos_gain += incGain
