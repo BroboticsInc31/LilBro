@@ -20,7 +20,7 @@ print('Drivers found!')
 
 alpha2 = []
 legParms = []
-l = np.linspace(0.105,0.145,60)
+l = np.linspace(0.105,0.145,100)
 alpha = 0
 l1 = 0.1
 l2 = 0.2
@@ -249,15 +249,15 @@ def readJS():
             if button_states['b']:
                 sweepOn = 0
 
-#            if type & 0x02:
-#                fvalue = value / 32767.0
-#                axis = axis_map[number]
-#                if(axis == 'ry'):
-#                    fvalue = (value / 32767.0) + 1
-#                    trigValue = fvalue           
-#                    axis_states[axis] = fvalue
-#                    print(trigValue)
-#                    inTime = 0.75*fvalue
+            if type & 0x02:
+                fvalue = value / 32767.0
+                axis = axis_map[number]
+                if(axis == 'ry'):
+                    fvalue = (value / 32767.0) + 1
+                    trigValue = fvalue           
+                    axis_states[axis] = fvalue
+                    print(trigValue)
+                    inTime = 0.75*fvalue
 
 # Start the readJS thread. Reads joystick in the "background"
 readJSThrd = threading.Thread(target=readJS)
@@ -304,10 +304,11 @@ while True:
                # print('Angles are ', math.degrees(theta1[i]),' and ', math.degrees(theta2[i]))
 
                 posNow = lilbro.toMotor(lilbro.toCount(math.degrees(theta1[i])))
-                lilbro.setPos(lilbro.driver1,posNow)
+                posNow1 = lilbro.toMotor(lilbro.toCount(math.degrees(theta1[i])-18))
+                lilbro.setPos(lilbro.driver1,posNow1)
                 lilbro.setPos(lilbro.driver2,posNow)
                 print('theta1 ',lilbro.getAngle(lilbro.driver1)[1])
-                time.sleep(0.005)
+                time.sleep(0.01)
 
             theta1f = np.flipud(theta1)
             for j in range(len(l)):
@@ -315,10 +316,11 @@ while True:
                     break
                         
                 posNow = lilbro.toMotor(lilbro.toCount(math.degrees(theta1f[j])))
-                lilbro.setPos(lilbro.driver1,posNow)
+                posNow1 = lilbro.toMotor(lilbro.toCount(math.degrees(theta1f[j])-18))
+                lilbro.setPos(lilbro.driver1,posNow1)
                 lilbro.setPos(lilbro.driver2,posNow)
                 print('theta1 flipped ',lilbro.getAngle(lilbro.driver1)[1])
-                time.sleep(0.005)
+                time.sleep(0.01)
 
         time.sleep(0.1)
 
