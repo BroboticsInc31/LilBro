@@ -6,19 +6,18 @@ import os, struct, array
 from fcntl import ioctl
 import globals 
 import time as time_
-import robot as robort
+import robot
 
 class control():
 
     def __init__(self):
         print("initialized controller class")
 
+
     def ctrl(self):
 
         flag = 1
         dataFlag = 1
-
-        armed = 0
 
         # Iterate over the joystick devices.
         print('Available devices:')
@@ -168,15 +167,15 @@ class control():
                         else:
                             print("%s released" % (button))
                 
-                if button_states['start'] and armed == 0:
+                if button_states['start'] and globals.armed == 0:
                     print("Motors Armed!")
-                    armed = 1
-                    robort.setStates(8)
+                    globals.armed = 1
+                    self.robort.setStates(8)
 
-                if button_states['select'] and armed == 1:
+                if button_states['select'] and globals.armed == 1:
                     print("Motors Unarmed!")
-                    armed = 0
-                    robort.setStates(1)
+                    globals.armed = 0
+                    self.robort.setStates(1)
 
 
                 if button_states['tr']:

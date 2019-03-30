@@ -38,7 +38,6 @@ class robot():
         self.pGain = 20
         self.driverCurLim = 50
         self.driverVelLim = 60000
-
         self.driver1 = 0
         self.driver2 = 0
         self.driver3 = 0
@@ -50,6 +49,7 @@ class robot():
         motorPos = []
         global motor1
         motor1 = []
+
     
     """ findDrivers finds Odrive motor drivers given their serial number in main class
 
@@ -64,7 +64,7 @@ class robot():
     def findDrivers(self, driverID1, driverID2):
         self.driver1 = odrive.find_any("usb",str(driverID1))
         self.driver2 = odrive.find_any("usb",str(driverID2))
-        now = time.time()
+        print('Found drivers!')
     
     def getDriver1(self):
         return self.driver1.serial_number
@@ -165,6 +165,11 @@ class robot():
 
     def toMotor(self,counts):
         return counts*5
+
+    def getAngle(self,driverx):
+        es1 = driverx.axis0.encoder.pos_estimate
+        es2 = driverx.axis1.encoder.pos_estimate
+        return [self.toDeg(self.toLeg(es1)),self.toDeg(self.toLeg(es2))]
 
     def setPos(self,driver,pos):
         driver.axis0.controller.pos_setpoint = pos
