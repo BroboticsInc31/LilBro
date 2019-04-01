@@ -177,6 +177,8 @@ def readJS():
     global pos_0
     global pos_1
     global sweepOn
+    global encFlag
+    encFlag = 0
     sweepOn = 0
     gain = 20
     walkPath = 0
@@ -236,16 +238,26 @@ def readJS():
                 print("Motors Unarmed!")
                 
             if button_states['dpad_up']:   
-                gain += 10
-                print(gain)
+                lilbro.addPGain(10)
+                print(lilbro.getPGain())
 
             if button_states['dpad_down']:
-                gain -= 10
-                print(gain)
+                lilbro.addPGain(-10)
+                print(lilbro.getPGain())
 
             if button_states['a']:
                 sweepOn = 1
 
+            if button_states['tr']:
+                if(encFlag == 1):
+                    print("Encoder angle offsets measurement ready!");
+                    lilbro.setStates(1)
+                elif(encFlag == -1):
+                    print("Encoder angle offsets measured!")
+                    encOffsets = lilbro.getEncOffsets()
+                    print("Encoder offsets are ",encOffsets)
+                encFlag = encFlag*-1
+            
             if button_states['b']:
                 sweepOn = 0
 
