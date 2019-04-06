@@ -15,8 +15,7 @@ print('Finding drivers...')
 globals.initialize()
 lilbro = robot.robot()
 
-lilbro.findDrivers(206237793548,388937803437)
-print('Drivers found!')
+lilbro.findDrivers(206237793548,388937803437,385E37853437,)
 
 alpha2 = []
 legParms = []
@@ -256,8 +255,8 @@ def readJS():
                     lilbro.setStates(1)
                 elif(encFlag == -1):
                     print("Encoder angle offsets measured!")
-                    encOffsets = lilbro.getEncOffsets()
-                    print("Encoder offsets are ",encOffsets)
+                    offset = lilbro.getEncOffsets()
+                    print("Encoder offsets are ",offset)
                 encFlag = encFlag*-1
             
             if button_states['b']:
@@ -277,13 +276,6 @@ def readJS():
 readJSThrd = threading.Thread(target=readJS)
 readJSThrd.daemon = True
 readJSThrd.start()
-
-# while(lilbro.driver1.axis0.current_state != 8):
-#     if(globals.reqState == 8):
-#         lilbro.setStates(globals.reqState)
-#         print("RAINBOW NIII")
-#     print("Mode is ",driver1.axis0.current_state," ,",driver1.axis1.current_state)
-#     time.sleep(0.1)
 
 # lilbro.setPos(driver,9800)
 print("Enter start")
@@ -316,11 +308,11 @@ while True:
                 theta2.append(math.atan2(legParms[i][2][0],legParms[i][2][1]))
 
                # print('Angles are ', math.degrees(theta1[i]),' and ', math.degrees(theta2[i]))
+                for k in range(len(offset)):
+                    posNow[k] = lilbro.toMotor(lilbro.toCount(math.degrees(theta1[i])+offset[k]))
 
-                posNow = lilbro.toMotor(lilbro.toCount(math.degrees(theta1[i])))
-                posNow1 = lilbro.toMotor(lilbro.toCount(math.degrees(theta1[i])-18))
-                lilbro.setPos(lilbro.driver1,posNow1)
-                lilbro.setPos(lilbro.driver2,posNow)
+                lilbro.setPosAll(posNow)
+
                 print('theta1 ',lilbro.getAngle(lilbro.driver1)[1])
                 time.sleep(0.01)
 
@@ -329,10 +321,11 @@ while True:
                 if(sweepOn == 0 or armed == 0):
                     break
                         
-                posNow = lilbro.toMotor(lilbro.toCount(math.degrees(theta1f[j])))
-                posNow1 = lilbro.toMotor(lilbro.toCount(math.degrees(theta1f[j])-18))
-                lilbro.setPos(lilbro.driver1,posNow1)
-                lilbro.setPos(lilbro.driver2,posNow)
+               for k in range(len(offset)):
+                    posNow[k] = lilbro.toMotor(lilbro.toCount(math.degrees(theta1f[i])+offset[k]))
+
+                lilbro.setPosAll(posNow)
+
                 print('theta1 flipped ',lilbro.getAngle(lilbro.driver1)[1])
                 time.sleep(0.01)
 

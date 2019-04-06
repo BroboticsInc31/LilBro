@@ -15,6 +15,7 @@ def initialize():
     global gainInc
     gainInc = 0
 
+<<<<<<< HEAD
     global armed
     armed = 0
 
@@ -26,3 +27,10 @@ def initialize():
     
     global modeNum
     modeNum = 3
+
+    global l1
+    l1 = 0.1
+
+    global l2
+    l2 = 0.22
+
