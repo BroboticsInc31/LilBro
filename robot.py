@@ -85,8 +85,8 @@ class robot():
         xdriver.axis1.controller.config.pos_gain = xgain
 
     def setPGains(self,newGain):
-        self.setGain(self.driver1,newGain)
-        self.setGain(self.driver2,newGain)
+        self.setPGain(self.driver1,newGain)
+        self.setPGain(self.driver2,newGain)
 
     def getPGain(self):
         return self.driver1.axis0.controller.config.pos_gain;
@@ -176,11 +176,11 @@ class robot():
 
     def getEncOffsets(self):
         ar = self.getAngles()
-        ar10 = 90 - ar[0][0]
-        ar11 = 90 - ar[0][1]
+        ar10 =  ar[0][0]
+        ar11 =  ar[0][1]
 
-        ar20 = 90 - ar[1][0]
-        ar21 = 90 - ar[1][1]
+        ar20 = ar[1][0]
+        ar21 = ar[1][1]
 
         return [ar10,ar11,ar20,ar21];
 

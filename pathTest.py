@@ -27,7 +27,7 @@ l2 = 0.2
 theta1 = []
 theta2 = []
 lilbro.setStates(1)
-lilbro.setGains(20)
+lilbro.setPGains(20)
 
 # Joystick Code --------------------------------------
 
@@ -178,7 +178,9 @@ def readJS():
     global pos_1
     global sweepOn
     global encFlag
-    encFlag = 0
+    global encOffsets
+    encOffsets = []
+    encFlag = 1
     sweepOn = 0
     gain = 20
     walkPath = 0
