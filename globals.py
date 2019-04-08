@@ -15,7 +15,6 @@ def initialize():
     global gainInc
     gainInc = 0
 
-<<<<<<< HEAD
     global armed
     armed = 0
 
