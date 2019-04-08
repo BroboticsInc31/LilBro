@@ -52,6 +52,21 @@ class robot():
         global motor1
         motor1 = []
 
+        global offset1, offset2, offset3, offset4
+        offset1 = [18.7,21.5]
+        offset2 = [35,15]
+        offset3 = [31.5,49.3]
+        offset4 = [20.5,45.5]
+
+        global ls1, ls2, as1, as2, t1, t2, theta1, theta2
+        ls1 = np.array([0,0,0,-320,4800,-24000,40000])
+        ls2 = np.array([0.1319,0.5267,-3.8189,13.4431,-23.8683,20.5761,-6.8587])
+        as1 = np.array([1,0,0,-1309,9817,-19635,0])
+        as2 = np.array([-1.1312,10.3427,-64.6418,177.765,-202.0057,80.8023,0])
+
+        t1 = np.linspace(0,0.2,20)
+        t2 = np.linspace(0.2,0.8,60)
+
         theta1 = np.array([])
         theta2 = np.array([])
 
@@ -100,13 +115,10 @@ class robot():
         xdriver.axis1.controller.config.pos_gain = xgain
 
     def setPGains(self,newGain):
-<<<<<<< HEAD
-=======
         self.setGain(self.driver1,newGain)
         self.setGain(self.driver2,newGain)
         self.setGain(self.driver3,newGain)
         self.setGain(self.driver4,newGain)
->>>>>>> 6ea2bda74aee9dab928d9db80c14772cb77b321c
 
     def getPGain(self):
         return self.driver1.axis0.controller.config.pos_gain;
@@ -209,8 +221,6 @@ class robot():
 
     def getEncOffsets(self):
         ar = self.getAngles()
-<<<<<<< HEAD
-=======
         ar10 = 86 - ar[0][0]
         ar11 = 86 - ar[0][1]
 
@@ -222,7 +232,6 @@ class robot():
 
         ar40 = 86 - ar[3][0]
         ar41 = 86 - ar[3][1]
->>>>>>> 6ea2bda74aee9dab928d9db80c14772cb77b321c
 
         return [ar10,ar11,ar20,ar21,ar30,ar31,ar40,ar41];
 
@@ -274,19 +283,71 @@ class robot():
         path1 = np.array([])
         path2 = np.array([])
 
+        alpha_1, alpha_2, alpha_3, alpha_4 = np.zeros(80)
+        l_1, l_2, l_3, l_4 = np.zeros(80)
+
+        alpha_s = np.array([alpha_1,alpha_2,alpha_3,alpha_4])
+        l_s = np.array([l_1,l_2,l_3,l_4])
+
+        print('Calculating equations of l and alpha')
+        l1_t = ls1[0]+ls1[1]*t1+ls1[2]*np.power(t1,2)+ls1[3]*np.power(t1,3)+ls1[4]*np.power(t1,4)+ls1[5]*np.power(t1,5)+ls1[6]*np.power(t1,6)
+        l2_t = ls2[0]+ls2[1]*t2+ls2[2]*np.power(t2,2)+ls2[3]*np.power(t2,3)+ls2[4]*np.power(t2,4)+ls2[5]*np.power(t2,5)+ls2[6]*np.power(t2,6)
+
+        a1_t = as1[0]+as1[1]*t1+as1[2]*np.power(t1,2)+as1[3]*np.power(t1,3)+as1[4]*np.power(t1,4)+as1[5]*np.power(t1,5)+as1[6]*np.power(t1,6)
+        a2_t = as2[0]+as2[1]*t2+as2[2]*np.power(t2,2)+as2[3]*np.power(t2,3)+as2[4]*np.power(t2,4)+as2[5]*np.power(t2,5)+as2[6]*np.power(t2,6)
+
         print('Calculating path of each leg!')
-        for i in range(len(l)):            
+
+        for i in range(len(t1)+len(t2)-1):
+            if (i<20):
+                alpha_1[i] = a1_t[i]
+                l_1[i] = l1_t[i]
+                alpha_2[i] = a2_t[i]
+                l_2[i] = l2_t[i]
+                alpha_3[i] = a2_t[i+20]
+                l_3[i] = l2_t[i+20]
+                alpha_4[i] = a2_t[i+40]
+                l_4[i] = l2_t[i+40]
+            elif (i<40):
+                alpha_1[i] = a2_t[i-20]
+                l_1[i] = l2_t[i-20]
+                alpha_2[i] = a2_t[i]
+                l_2[i] = l2_t[i]
+                alpha_3[i] = a2_t[i+20]
+                l_3[i] = l2_t[i+20]
+                alpha_4[i] = a1_t[i-20]
+                l_4[i] = l1_t[i-20]
+            elif (i<60):
+                alpha_1[i] = a2_t[i-20]
+                l_1[i] = l2_t[i-20]
+                alpha_2[i] = a2_t[i]
+                l_2[i] = l2_t[i]
+                alpha_3[i] = a1_t[i-40]
+                l_3[i] = l1_t[i-40]
+                alpha_4[i] = a2_t[i-40]
+                l_4[i] = l2_t[i-40]
+            else:
+                alpha_1[i] = a2_t[i-20]
+                l_1[i] = l2_t[i-20]
+                alpha_2[i] = a1_t[i-60]
+                l_2[i] = l1_t[i-60]
+                alpha_3[i] = a2_t[i-60]
+                l_3[i] = l2_t[i-60]
+                alpha_4[i] = a1_t[i-40]
+                l_4[i] = l1_t[i-40]
+
             for j in range(3):
-                alpha1[j].append(alpha[i] - math.pi/2)
-                alpha2[j].append(math.acos((((l1**2)+((l[i])**2)-(l2**2))/(2*l1*l[i]))))
+                alpha1[j].append(alpha_s[j][i] - math.pi/2)
+                alpha2[j].append(math.acos((((globals.l1**2)+((l_s[j][i])**2)-(globals.l2**2))/(2*globals.l1*l_s[j][i]))))
          
                 self.legParms[j].append(self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2))
 
                 theta1[j].append(math.atan2(self.legParms[j][i][1][0],self.legParms[j][i][1][1]))
                 theta2[j].append(math.atan2(self.legParms[j][i][2][0],self.legParms[j][i][2][1]))
 
-                path1[j].append(self.setAngles(theta1[j]))
-                path2[j].append(self.setAngles(theta2[j]))
+                if(i>78):
+                    path1[j].append(self.setAngles(theta1[j]))
+                    path2[j].append(self.setAngles(theta2[j]))
         
         print('Paths calculated!')
         return [path1,path2];
