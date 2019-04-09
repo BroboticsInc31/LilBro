@@ -276,15 +276,15 @@ class robot():
 
         return [base,leftshoulder,rightshoulder,foot]; 
 
-    def getPath(self,l,alpha,offset):
-        alpha1 = np.array([])
-        alpha2 = np.array([])
+    def getPath(self):
+        alpha1 = np.zeros(80)
+        alpha2 = np.zeros(80)
 
-        path1 = np.array([])
-        path2 = np.array([])
+        path1 = np.zeros(80)
+        path2 = np.zeros(80)
 
-        alpha_1, alpha_2, alpha_3, alpha_4 = np.zeros(80)
-        l_1, l_2, l_3, l_4 = np.zeros(80)
+        alpha_1 = alpha_2 = alpha_3 = alpha_4 = np.zeros(80)
+        l_1 = l_2 = l_3 = l_4 = np.zeros(80)
 
         alpha_s = np.array([alpha_1,alpha_2,alpha_3,alpha_4])
         l_s = np.array([l_1,l_2,l_3,l_4])
@@ -337,17 +337,18 @@ class robot():
                 l_4[i] = l1_t[i-40]
 
             for j in range(3):
-                alpha1[j].append(alpha_s[j][i] - math.pi/2)
-                alpha2[j].append(math.acos((((globals.l1**2)+((l_s[j][i])**2)-(globals.l2**2))/(2*globals.l1*l_s[j][i]))))
+                alpha1[j][i] = (alpha_s[j][i] - math.pi/2)
+                alpha2[j][i] = (math.acos((((globals.l1**2)+((l_s[j][i])**2)-(globals.l2**2))/(2*globals.l1*l_s[j][i]))))
          
-                self.legParms[j].append(self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2))
+                self.legParms[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2))
 
-                theta1[j].append(math.atan2(self.legParms[j][i][1][0],self.legParms[j][i][1][1]))
-                theta2[j].append(math.atan2(self.legParms[j][i][2][0],self.legParms[j][i][2][1]))
+                theta1[j][i] = (math.atan2(self.legParms[j][i][1][0],self.legParms[j][i][1][1]))
+                theta2[j][i] = (math.atan2(self.legParms[j][i][2][0],self.legParms[j][i][2][1]))
 
                 if(i>78):
-                    path1[j].append(self.setAngles(theta1[j]))
-                    path2[j].append(self.setAngles(theta2[j]))
-        
+                    path1[j] = (self.setAngles(theta1[j]))
+                    path2[j] = (self.setAngles(theta2[j]))
+
+            print('Iteration ',i)
         print('Paths calculated!')
         return [path1,path2];
