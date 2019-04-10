@@ -43,7 +43,10 @@ class robot():
         self.driver3 = 0
         self.driver4 = 0
 
-        self.legParms = np.array([])
+        self.leftShoulderx = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        self.rightShoulderx = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        self.leftShouldery = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        self.rightShouldery = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
 
         global timeArray
         timeArray = []
@@ -59,17 +62,16 @@ class robot():
         offset4 = [20.5,45.5]
 
         global ls1, ls2, as1, as2, t1, t2, theta1, theta2
-        ls1 = np.array([0,0,0,-320,4800,-24000,40000])
-        ls2 = np.array([0.1319,0.5267,-3.8189,13.4431,-23.8683,20.5761,-6.8587])
-        as1 = np.array([1,0,0,-1309,9817,-19635,0])
-        as2 = np.array([-1.1312,10.3427,-64.6418,177.765,-202.0057,80.8023,0])
+        ls1 = np.array([0.175,0,0,-320,4800,-24000,40000])
+        ls2 = np.array([0.1581,0.316,-2.2914,8.0658,-14.321,12.3457,-4.1152])
+        as1 = np.array([0.5236,0,0,-1309,9817,-19635,1.706*(10**-9)])
+        as2 = np.array([-1.1312,10.3427,-64.6418,177.765,-202.0057,80.8023,-9.068*(10**-12)])
 
         t1 = np.linspace(0,0.2,20)
         t2 = np.linspace(0.2,0.8,60)
-
-        theta1 = np.array([])
-        theta2 = np.array([])
-
+        
+        theta1 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        theta2 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
     
     """ findDrivers finds Odrive motor drivers given their serial number in main class
 
@@ -253,7 +255,7 @@ class robot():
         self.driver4.axis1.controller.pos_setpoint = pos[7]        
 
     def setAngles(self,rads):
-        posNow = []
+        posNow = np.zeros(len(rads))
         for i in range(len(rads)):
             posNow[i] = self.toMotor(self.toCount(math.degrees(rads[i])))
         return posNow;
@@ -277,17 +279,14 @@ class robot():
         return [base,leftshoulder,rightshoulder,foot]; 
 
     def getPath(self):
-        alpha1 = np.zeros(80)
-        alpha2 = np.zeros(80)
+        alpha1 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        alpha2 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
 
-        path1 = np.zeros(80)
-        path2 = np.zeros(80)
+        path1 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        path2 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
 
-        alpha_1 = alpha_2 = alpha_3 = alpha_4 = np.zeros(80)
-        l_1 = l_2 = l_3 = l_4 = np.zeros(80)
-
-        alpha_s = np.array([alpha_1,alpha_2,alpha_3,alpha_4])
-        l_s = np.array([l_1,l_2,l_3,l_4])
+        alpha_1, alpha_2, alpha_3, alpha_4 = np.zeros(80,dtype=float), np.zeros(80,dtype=float), np.zeros(80,dtype=float), np.zeros(80,dtype=float)       
+        l_1, l_2, l_3, l_4 = np.zeros(80,dtype=float), np.zeros(80,dtype=float), np.zeros(80,dtype=float), np.zeros(80,dtype=float)
 
         print('Calculating equations of l and alpha')
         l1_t = ls1[0]+ls1[1]*t1+ls1[2]*np.power(t1,2)+ls1[3]*np.power(t1,3)+ls1[4]*np.power(t1,4)+ls1[5]*np.power(t1,5)+ls1[6]*np.power(t1,6)
@@ -296,9 +295,13 @@ class robot():
         a1_t = as1[0]+as1[1]*t1+as1[2]*np.power(t1,2)+as1[3]*np.power(t1,3)+as1[4]*np.power(t1,4)+as1[5]*np.power(t1,5)+as1[6]*np.power(t1,6)
         a2_t = as2[0]+as2[1]*t2+as2[2]*np.power(t2,2)+as2[3]*np.power(t2,3)+as2[4]*np.power(t2,4)+as2[5]*np.power(t2,5)+as2[6]*np.power(t2,6)
 
+        print(l1_t)
+        print(l2_t)
+        print(a1_t)
+        print(a2_t)
         print('Calculating path of each leg!')
-
-        for i in range(len(t1)+len(t2)-1):
+        print('Length is ',len(t1)+len(t2)-1)
+        for i in range(len(t1)+len(t2)):
             if (i<20):
                 alpha_1[i] = a1_t[i]
                 l_1[i] = l1_t[i]
@@ -333,22 +336,32 @@ class robot():
                 l_2[i] = l1_t[i-60]
                 alpha_3[i] = a2_t[i-60]
                 l_3[i] = l2_t[i-60]
-                alpha_4[i] = a1_t[i-40]
-                l_4[i] = l1_t[i-40]
-
-            for j in range(3):
+                alpha_4[i] = a2_t[i-40]
+                l_4[i] = l2_t[i-40]
+            
+            alpha_s = np.array([alpha_1,alpha_2,alpha_3,alpha_4])
+            l_s = np.array([l_1,l_2,l_3,l_4])
+            print('Alphas ',alpha_s[0][i],' ',alpha_s[2][i])
+            #print('L ',l_s)
+            for j in range(4):
                 alpha1[j][i] = (alpha_s[j][i] - math.pi/2)
                 alpha2[j][i] = (math.acos((((globals.l1**2)+((l_s[j][i])**2)-(globals.l2**2))/(2*globals.l1*l_s[j][i]))))
          
-                self.legParms[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2))
+                self.leftShoulderx[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2)[1][0]) 
+                self.rightShoulderx[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2)[2][0])
+                self.leftShouldery[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2)[1][1]) 
+                self.rightShouldery[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2)[2][1])
 
-                theta1[j][i] = (math.atan2(self.legParms[j][i][1][0],self.legParms[j][i][1][1]))
-                theta2[j][i] = (math.atan2(self.legParms[j][i][2][0],self.legParms[j][i][2][1]))
+                theta1[j][i] = (math.acos(self.rightShouldery[j][i]/globals.l1))
+                theta2[j][i] = (math.acos(self.leftShouldery[j][i]/globals.l1))
 
                 if(i>78):
                     path1[j] = (self.setAngles(theta1[j]))
                     path2[j] = (self.setAngles(theta2[j]))
 
             print('Iteration ',i)
+        
         print('Paths calculated!')
-        return [path1,path2];
+        print(alpha1)
+        print(alpha2)
+        return [theta1,theta2];
