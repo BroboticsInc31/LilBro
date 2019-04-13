@@ -43,17 +43,25 @@ class robot():
         self.driver3 = 0
         self.driver4 = 0
 
-        self.leftShoulderx = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
-        self.rightShoulderx = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
-        self.leftShouldery = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
-        self.rightShouldery = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        global n
+        n = 40
+        self.leftShoulderx = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
+        self.rightShoulderx = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
+        self.leftShouldery = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
+        self.rightShouldery = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
 
         global timeArray
         timeArray = []
-        global motorPos
+        global motorPos, motorVel, motorCur
         motorPos = []
-        global motor1
-        motor1 = []
+        motorVel = []
+        motorCur = []
+        global motors0, motors1, motors2, motors3, motors4, motors5, motors6, motors7
+        motors0, motors1, motors2, motors3, motors4, motors5, motors6, motors7 = [], [], [], [], [], [], [], []
+        global motorsVel0, motorsVel1, motorsVel2, motorsVel3, motorsVel4, motorsVel5, motorsVel6, motorsVel7 
+        motorsVel0, motorVel1, motorsVel2, motorsVel3, motorsVel4, motorsVel5, motorsVel6, motorsVel7 = [], [], [], [], [], [], [], []
+        global motorsCur0, motorsCur1, motorsCur2, motorsCur3, motorsCur4, motorsCur5, motorsCur6, motorsCur7
+        motorsCur0, motorCur1, motorsCur2, motorsCur3, motorsCur4, motorsCur5, motorsCur6, motorsCur7 = [], [], [], [], [], [], [], []
 
         global offset1, offset2, offset3, offset4
         offset1 = [18.7,21.5]
@@ -62,16 +70,16 @@ class robot():
         offset4 = [20.5,45.5]
 
         global ls1, ls2, as1, as2, t1, t2, theta1, theta2
-        ls1 = np.array([0.175,0,0,-320,4800,-24000,40000])
-        ls2 = np.array([0.1581,0.316,-2.2914,8.0658,-14.321,12.3457,-4.1152])
-        as1 = np.array([0.5236,0,0,-1309,9817,-19635,1.706*(10**-9)])
-        as2 = np.array([-1.1312,10.3427,-64.6418,177.765,-202.0057,80.8023,-9.068*(10**-12)])
+        ls1 = np.array([0.16,0,0,-160,2400,-12000,20000])
+        ls2 = np.array([0.1319,0.5267,-3.8189,13.44,-23.868,20.58,-6.8587])
+        as1 = np.array([0.2618,0,0,-654.5,4909,-9818,8.53*(10**-10)])
+        as2 = np.array([-0.5656,5.1713,-32.32,88.88,-101.0,40.40,-4.53*(10**-12)])
 
-        t1 = np.linspace(0,0.2,20)
-        t2 = np.linspace(0.2,0.8,60)
+        t1 = np.linspace(0,0.2,n/4)
+        t2 = np.linspace(0.2,0.8,3*n/4)
         
-        theta1 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
-        theta2 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        theta1 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
+        theta2 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
     
     """ findDrivers finds Odrive motor drivers given their serial number in main class
 
@@ -117,10 +125,10 @@ class robot():
         xdriver.axis1.controller.config.pos_gain = xgain
 
     def setPGains(self,newGain):
-        self.setGain(self.driver1,newGain)
-        self.setGain(self.driver2,newGain)
-        self.setGain(self.driver3,newGain)
-        self.setGain(self.driver4,newGain)
+        self.setPGain(self.driver1,newGain)
+        self.setPGain(self.driver2,newGain)
+        self.setPGain(self.driver3,newGain)
+        self.setPGain(self.driver4,newGain)
 
     def getPGain(self):
         return self.driver1.axis0.controller.config.pos_gain;
@@ -166,13 +174,35 @@ class robot():
         self.setCurLim(self.driver3,curLim)
         self.setCurLim(self.driver4,curLim)
 
+    def setTrajParms(self,driver,vlim,alim,dlim,A):
+        driver.axis0.trap_traj.config.vel_limit = vlim
+        driver.axis0.trap_traj.config.accel_limit = alim
+        driver.axis0.trap_traj.config.decel_limit = dlim
+        driver.axis0.trap_traj.config.A_per_css = A
+
+        driver.axis1.trap_traj.config.vel_limit = vlim
+        driver.axis1.trap_traj.config.accel_limit = alim
+        driver.axis1.trap_traj.config.decel_limit = dlim
+        driver.axis1.trap_traj.config.A_per_css = A
+
+    def setTrajAll(self,vlim,alim,dlim,A):
+        self.setTrajParms(self.driver1,vlim,alim,dlim,A)
+        self.setTrajParms(self.driver2,vlim,alim,dlim,A)
+        self.setTrajParms(self.driver3,vlim,alim,dlim,A)
+        self.setTrajParms(self.driver4,vlim,alim,dlim,A)
+
 
     def getCount(self,driver):
-        return [self.driver.axis0.encoder.pos_estimate,self.driver.axis1.encoder.pos_estimate];
+        return [driver.axis0.encoder.pos_estimate,driver.axis1.encoder.pos_estimate];
 
     def getCounts(self):
         return [self.getCount(self.driver1),self.getCount(self.driver2),self.getCount(self.driver3),self.getCount(self.driver4)];
 
+    def getVel(self,driver):
+        return [driver.axis0.encoder.vel_estimate,driver.axis1.encoder.vel_estimate];
+
+    def getVels(self):
+        return [self.getVel(self.driver1),self.getVel(self.driver2),self.getVel(self.driver3),self.getVel(self.driver4)];
 
     def getCurrent(self,driver):
         return [self.driver.axis0.motor.current_control.Iq_measured,self.driver.axis1.motor.current_control.Iq_measured]
@@ -191,21 +221,62 @@ class robot():
         return [self.getTemp(self.driver1),self.getTemp(self.driver2),self.getTemp(self.driver3),self.getTemp(self.driver4)];
 
 
-    def writeToFile(self,saved):
+    def writePosFile(self,saved):
         if(globals.dataOn == 1):
             motorPos = self.getCounts()
             timeArray.append(time.time() - globals.startTime)
-            motor1.append(motorPos[0])
+            motors0.append(motorPos[0][0])
+            motors1.append(motorPos[0][1])
+            motors2.append(motorPos[1][0])
+            motors3.append(motorPos[1][1])
+            motors4.append(motorPos[2][0])
+            motors5.append(motorPos[2][1])
+            motors6.append(motorPos[3][0])
+            motors7.append(motorPos[3][1])
+
         elif(globals.dataOn == 0 and saved == 0):
-            np.savetxt('ClassPositions.txt',np.c_[timeArray,motor1],fmt="%.3f %.3f")
+            np.savetxt('MotorPositions.txt',np.c_[timeArray,motors0,motors1,motors2,motors3,motors4,motors5,motors6,motors7],fmt="%.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f")
             saved = 1
 
+    def writeVelFile(self,saved):
+        if(globals.dataOn == 1):
+            motorVel = self.getVels()
+            timeArray.append(time.time() - globals.startTime)
+            motorsVel0.append(motorVel[0][0])
+            motorsVel1.append(motorVel[0][1])
+            motorsVel2.append(motorVel[1][0])
+            motorsVel3.append(motorVel[1][1])
+            motorsVel4.append(motorVel[2][0])
+            motorsVel5.append(motorVel[2][1])
+            motorsVel6.append(motorVel[3][0])
+            motorsVel7.append(motorVel[3][1])
+
+        elif(globals.dataOn == 0 and saved == 0):
+            np.savetxt('MotorVelocities.txt',np.c_[timeArray,motorsVel0,motorsVel1,motorsVel2,motorsVel3,motorsVel4,motorsVel5,motorsVel6,motorsVel7],fmt="%.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f")
+            saved = 1
+
+    def writeCurFile(self,saved):
+        if(globals.dataOn == 1):
+            motorCur = self.getCurrents()
+            timeArray.append(time.time() - globals.startTime)
+            motorsCur0.append(motorCur[0][0])
+            motorsCur1.append(motorCur[0][1])
+            motorsCur2.append(motorCur[1][0])
+            motorsCur3.append(motorCur[1][1])
+            motorsCur4.append(motorCur[2][0])
+            motorsCur5.append(motorCur[2][1])
+            motorsCur6.append(motorCur[3][0])
+            motorsCur7.append(motorCur[3][1])
+
+        elif(globals.dataOn == 0 and saved == 0):
+            np.savetxt('MotorCurrents.txt',np.c_[timeArray,motorsCur0,motorsCur1,motorsCur2,motorsCur3,motorsCur4,motorsCur5,motorsCur6,motorsCur7],fmt="%.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f")
+            saved = 1
 
     def toDeg(self,counts):
-        return 360*(counts)/8192
+        return 360*(counts)*(1/8192)
 
     def toCount(self,degrees):
-        return 8192*(degrees)/360
+        return 8192*(degrees)*(1/360)
 
     def toLeg(self,counts):
         return counts*(1/5)
@@ -223,18 +294,18 @@ class robot():
 
     def getEncOffsets(self):
         ar = self.getAngles()
-        ar10 = 86 - ar[0][0]
-        ar11 = 86 - ar[0][1]
+        ar10 = 86 + ar[0][0]
+        ar11 = 86 + ar[0][1]
 
-        ar20 = 86 - ar[1][0]
-        ar21 = 86 - ar[1][1]
+        ar20 = 86 + ar[1][0]
+        ar21 = 86 + ar[1][1]
 
         ar30 = 86 - ar[2][0]
         ar31 = 86 - ar[2][1]
 
         ar40 = 86 - ar[3][0]
         ar41 = 86 - ar[3][1]
-
+        
         return [ar10,ar11,ar20,ar21,ar30,ar31,ar40,ar41];
 
     def setPos(self,driver,pos):
@@ -260,6 +331,15 @@ class robot():
             posNow[i] = self.toMotor(self.toCount(math.degrees(rads[i])))
         return posNow;
 
+    def setTraj(self,driver,pos):
+        driver.axis0.controller.move_to_pos(pos[0])
+        driver.axis1.controller.move_to_pos(pos[1])
+
+    def setTrajs(self,posList):
+        self.setTraj(self.driver1,posList[0])
+        self.setTraj(self.driver2,posList[1])
+        self.setTraj(self.driver3,posList[2])
+        self.setTraj(self.driver4,posList[3])
 
     def rotation(self,theta):
         R = np.array([[math.cos(theta),-math.sin(theta)],[math.sin(theta),math.cos(theta)]])
@@ -279,14 +359,14 @@ class robot():
         return [base,leftshoulder,rightshoulder,foot]; 
 
     def getPath(self):
-        alpha1 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
-        alpha2 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        alpha1 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
+        alpha2 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
 
-        path1 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
-        path2 = np.array([np.zeros(80),np.zeros(80),np.zeros(80),np.zeros(80)])
+        path1 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
+        path2 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
 
-        alpha_1, alpha_2, alpha_3, alpha_4 = np.zeros(80,dtype=float), np.zeros(80,dtype=float), np.zeros(80,dtype=float), np.zeros(80,dtype=float)       
-        l_1, l_2, l_3, l_4 = np.zeros(80,dtype=float), np.zeros(80,dtype=float), np.zeros(80,dtype=float), np.zeros(80,dtype=float)
+        alpha_1, alpha_2, alpha_3, alpha_4 = np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float)       
+        l_1, l_2, l_3, l_4 = np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float)
 
         print('Calculating equations of l and alpha')
         l1_t = ls1[0]+ls1[1]*t1+ls1[2]*np.power(t1,2)+ls1[3]*np.power(t1,3)+ls1[4]*np.power(t1,4)+ls1[5]*np.power(t1,5)+ls1[6]*np.power(t1,6)
@@ -302,42 +382,42 @@ class robot():
         print('Calculating path of each leg!')
         print('Length is ',len(t1)+len(t2)-1)
         for i in range(len(t1)+len(t2)):
-            if (i<20):
+            if (i<n/4):
                 alpha_1[i] = a1_t[i]
                 l_1[i] = l1_t[i]
                 alpha_2[i] = a2_t[i]
                 l_2[i] = l2_t[i]
-                alpha_3[i] = a2_t[i+20]
-                l_3[i] = l2_t[i+20]
-                alpha_4[i] = a2_t[i+40]
-                l_4[i] = l2_t[i+40]
-            elif (i<40):
-                alpha_1[i] = a2_t[i-20]
-                l_1[i] = l2_t[i-20]
+                alpha_3[i] = a2_t[int(i+n/4)]
+                l_3[i] = l2_t[int(i+n/4)]
+                alpha_4[i] = a2_t[int(i+n/2)]
+                l_4[i] = l2_t[int(i+n/2)]
+            elif (i<n/2):
+                alpha_1[i] = a2_t[int(i-n/4)]
+                l_1[i] = l2_t[int(i-n/4)]
                 alpha_2[i] = a2_t[i]
                 l_2[i] = l2_t[i]
-                alpha_3[i] = a2_t[i+20]
-                l_3[i] = l2_t[i+20]
-                alpha_4[i] = a1_t[i-20]
-                l_4[i] = l1_t[i-20]
-            elif (i<60):
-                alpha_1[i] = a2_t[i-20]
-                l_1[i] = l2_t[i-20]
+                alpha_3[i] = a2_t[int(i+n/4)]
+                l_3[i] = l2_t[int(i+n/4)]
+                alpha_4[i] = a1_t[int(i-n/4)]
+                l_4[i] = l1_t[int(i-n/4)]
+            elif (i<3*n/4):
+                alpha_1[i] = a2_t[int(i-n/4)]
+                l_1[i] = l2_t[int(i-n/4)]
                 alpha_2[i] = a2_t[i]
                 l_2[i] = l2_t[i]
-                alpha_3[i] = a1_t[i-40]
-                l_3[i] = l1_t[i-40]
-                alpha_4[i] = a2_t[i-40]
-                l_4[i] = l2_t[i-40]
+                alpha_3[i] = a1_t[int(i-n/2)]
+                l_3[i] = l1_t[int(i-n/2)]
+                alpha_4[i] = a2_t[int(i-n/2)]
+                l_4[i] = l2_t[int(i-n/2)]
             else:
-                alpha_1[i] = a2_t[i-20]
-                l_1[i] = l2_t[i-20]
-                alpha_2[i] = a1_t[i-60]
-                l_2[i] = l1_t[i-60]
-                alpha_3[i] = a2_t[i-60]
-                l_3[i] = l2_t[i-60]
-                alpha_4[i] = a2_t[i-40]
-                l_4[i] = l2_t[i-40]
+                alpha_1[i] = a2_t[int(i-n/4)]
+                l_1[i] = l2_t[int(i-n/4)]
+                alpha_2[i] = a1_t[int(i-3*n/4)]
+                l_2[i] = l1_t[int(i-3*n/4)]
+                alpha_3[i] = a2_t[int(i-3*n/4)]
+                l_3[i] = l2_t[int(i-3*n/4)]
+                alpha_4[i] = a2_t[int(i-n/2)]
+                l_4[i] = l2_t[int(i-n/2)]
             
             alpha_s = np.array([alpha_1,alpha_2,alpha_3,alpha_4])
             l_s = np.array([l_1,l_2,l_3,l_4])
@@ -355,7 +435,7 @@ class robot():
                 theta1[j][i] = (math.acos(self.rightShouldery[j][i]/globals.l1))
                 theta2[j][i] = (math.acos(self.leftShouldery[j][i]/globals.l1))
 
-                if(i>78):
+                if(i>n-2):
                     path1[j] = (self.setAngles(theta1[j]))
                     path2[j] = (self.setAngles(theta2[j]))
 
