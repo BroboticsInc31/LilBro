@@ -70,10 +70,10 @@ class robot():
         offset4 = [20.5,45.5]
 
         global ls1, ls2, as1, as2, t1, t2, theta1, theta2
-        ls1 = np.array([0.16,0,0,-160,2400,-12000,20000])
-        ls2 = np.array([0.1319,0.5267,-3.8189,13.44,-23.868,20.58,-6.8587])
-        as1 = np.array([0.2618,0,0,-654.5,4909,-9818,8.53*(10**-10)])
-        as2 = np.array([-0.5656,5.1713,-32.32,88.88,-101.0,40.40,-4.53*(10**-12)])
+        ls1 = np.array([0.18,0,0,-320,4800,-24000,40000])
+        ls2 = np.array([0.1519,0.5267,-3.8189,13.44,-23.868,20.58,-6.8587])
+        as1 = np.array([0.1309,0,0,-327.25,2454.4,-4908.7,4.266*(10**-10)])
+        as2 = np.array([-0.2828,2.5857,-16.161,44.44,-50.5,20.2,-2.267*(10**-12)])
 
         t1 = np.linspace(0,0.2,n/4)
         t2 = np.linspace(0.2,0.8,3*n/4)
@@ -130,8 +130,34 @@ class robot():
         self.setPGain(self.driver3,newGain)
         self.setPGain(self.driver4,newGain)
 
+    def setVelGain(self,xdriver,xgain):
+        xdriver.axis0.controller.config.vel_gain = xgain
+        xdriver.axis1.controller.config.vel_gain = xgain
+
+    def setVelGains(self,newGain):
+        self.setVelGain(self.driver1,newGain)
+        self.setVelGain(self.driver2,newGain)
+        self.setVelGain(self.driver3,newGain)
+        self.setVelGain(self.driver4,newGain)
+
+    def setVelIntGain(self,xdriver,xgain):
+        xdriver.axis0.controller.config.vel_integrator_gain = xgain
+        xdriver.axis1.controller.config.vel_integrator_gain = xgain
+
+    def setVelIntGains(self,newGain):
+        self.setVelIntGain(self.driver1,newGain)
+        self.setVelIntGain(self.driver2,newGain)
+        self.setVelIntGain(self.driver3,newGain)
+        self.setVelIntGain(self.driver4,newGain)
+
     def getPGain(self):
         return self.driver1.axis0.controller.config.pos_gain;
+
+    def getVelGain(self):
+        return self.driver1.axis0.controller.config.vel_gain;
+
+    def getVelIntGain(self):
+        return self.driver1.axis0.controller.config.vel_integrator_gain;
 
     def addPGain(self,incGain):
         self.driver1.axis0.controller.config.pos_gain += incGain
@@ -205,7 +231,7 @@ class robot():
         return [self.getVel(self.driver1),self.getVel(self.driver2),self.getVel(self.driver3),self.getVel(self.driver4)];
 
     def getCurrent(self,driver):
-        return [self.driver.axis0.motor.current_control.Iq_measured,self.driver.axis1.motor.current_control.Iq_measured]
+        return [driver.axis0.motor.current_control.Iq_measured,driver.axis1.motor.current_control.Iq_measured]
 
     def getCurrents(self):
         return [self.getCurrent(self.driver1),self.getCurrent(self.driver2),self.getCurrent(self.driver3),self.getCurrent(self.driver4)];
