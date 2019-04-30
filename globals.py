@@ -4,6 +4,9 @@ def initialize():
     global mode
     mode = 0
 
+    global modeStat 
+    modeStat = 0
+
     global dataOn
     dataOn = 0
     global startTime
@@ -26,6 +29,9 @@ def initialize():
     
     global modeNum
     modeNum = 3
+
+    global decMode
+    decMode = 4
 
     global l1
     l1 = 0.1
