@@ -7,5 +7,6 @@ Lil'Bro is a 3D printed, open source quadrupedal robot which allows researchers 
 
 
 
-![screen shot 2019-02-18 at 9 23 33 pm](https://user-images.githubusercontent.com/31290912/52988433-ec258800-33c4-11e9-9f8b-c3d3a895895e.png)
+![LilBro](https://user-images.githubusercontent.com/31290912/57098486-d6dfaa80-6cdf-11e9-85ec-43d3b1a3ba4f.png)
+
 Lil'Bro V1.0
