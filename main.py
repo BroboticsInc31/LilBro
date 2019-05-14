@@ -43,7 +43,7 @@ theta1m = []
 theta2m = []
 theta1_s = []
 theta2_s = []
-n = 32
+n = 24
 nh = 7
 
 lilbro.setStates(1)
@@ -210,6 +210,8 @@ def readJS():
     global pathOn, manSquat, pathCalc, trotCalc, trotOn, thOn, thCalc, marchOn
     global off1, off2, off3, off4
     global standby
+    global walking
+    walking = 0
     standby = 1
     walkDir = 1
     pathOn = 0
@@ -401,17 +403,11 @@ def readJS():
             if type & 0x02:
                 fvalue = value / 32767.0
                 axis = axis_map[number]
-                if(axis == 'ry'):
-                    fvalue = (value / 32767.0) + 1
-                    trigValue = fvalue
-                    map1 = ctrl_map(fvalue,0,2,0,len(l_m)-1)
-                    axis_states[axis] = fvalue
-                    print(trigValue)
-                    inTime = 0.75*fvalue
-
                 if(axis == 'y'):
-                    fvalue2 = (value / 32767.0) + 1
-                    map2 = ctrl_map(fvalue2,0,2,0,len(l_m)-1)
+                    fvalue = (value / 32767.0) * -1
+                    trigValue = fvalue
+                    walking = fvalue
+                    axis_states[axis] = fvalue
 
 # Start the readJS thread. Reads joystick in the "background"
 readJSThrd = threading.Thread(target=readJS)
@@ -737,7 +733,7 @@ while True:
                     trotPathFlip7 = np.flipud(trotPath[1][3])
                     trotPathFlip8 = np.flipud(trotPath[0][3])
             
-                if(walkDir == 1):
+                if(walking > 0.5):
                     for i in range(n):
                          if(globals.modeNum != 7 or armed == 0 or globals.modeStat == 1 or standby == 1):
                              break
@@ -772,7 +768,7 @@ while True:
 
                          time_.sleep(0.0005)
 
-                if(walkDir == -1):
+                elif(walking < -0.5):
                     for i in range(n):
                          if(globals.modeNum != 7 or armed == 0 or globals.modeStat == 1 or standby == 1):
                              break
@@ -807,6 +803,15 @@ while True:
 
                          time_.sleep(0.0005)
 
+                else: 
+                    lilbro.driver1.axis0.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(-50+offset[0])))
+                    lilbro.driver1.axis1.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(-50+offset[1])))
+                    lilbro.driver2.axis0.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(-50+offset[2])))
+                    lilbro.driver2.axis1.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(-50+offset[3])))
+                    lilbro.driver3.axis0.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(50-1*offset[4])))
+                    lilbro.driver3.axis1.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(50-1*offset[5])))
+                    lilbro.driver4.axis0.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(50-1*offset[6])))
+                    lilbro.driver4.axis1.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(50-1*offset[7])))
 
     except (KeyboardInterrupt):
         lilbro.setStates(1) 
