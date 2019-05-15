@@ -63,8 +63,10 @@ class robot():
         self.driver3 = 0
         self.driver4 = 0
 
-        global n, nh
-        n = 24
+        global n, nh, leng_coeff1, leng_coeff2, alpha_coeff1, alpha_coeff2, t
+
+        t = 0.4
+        n = 12
         nh = 7
         self.leftShoulderx = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
         self.rightShoulderx = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
@@ -89,51 +91,21 @@ class robot():
         global motorsCur0, motorsCur1, motorsCur2, motorsCur3, motorsCur4, motorsCur5, motorsCur6, motorsCur7
         motorsCur0, motorCur1, motorsCur2, motorsCur3, motorsCur4, motorsCur5, motorsCur6, motorsCur7 = [], [], [], [], [], [], [], []
 
-        global offset1, offset2, offset3, offset4
-        offset1 = [18.7,21.5]
-        offset2 = [35,15]
-        offset3 = [31.5,49.3]
-        offset4 = [20.5,45.5]
+        global theta1_t, theta2_t, theta1_ht, theta2_ht, t1_th, t2_th, theta1f, theta2f, theta1_b, theta2_b
 
-        global ls1, ls2, as1, as2, t1, t2, theta1, theta2, theta1_t, theta2_t, theta1_ht, theta2_ht, t1_th, t2_th, theta1f, theta2f, theta1_b, theta2_b
-        ls1 = np.array([0.17,0,0,-35,262.5,-656.25,546.875])
-        ls2 = np.array([2.73,-28.8,132,-315,412.5,-281.25,78.125])
-        as1 = np.array([0.2618,0,0,-81.81,306.8,-306.8,1.33*(10**-11)])
-        as2 = np.array([-16.493,157.08,-589,1063.6,-920.4,306.8,-2*(10**-10)])
-
-        global ls1_t, ls2_t, as1_t, as2_t, t1_trot, t2_trot, l_down, ls1_t2, ls2_t2, as1_t2, as2_t2
-        #ls1_t = np.array([0.175,0,0,-40,300,-750,625])
-        #ls2_t = np.array([0.175,-1.847*(10**-14),4.75*(10**-13),-3.356*(10**-13),9.159*(10**-13),-2.607*(10**-13),-1.903*(10**-13)])
-        #as1_t = np.array([0.1309,0,0,-40.91,153.3981,-153.3981,6.67*(10**-12)])
-        #as2_t = np.array([-8.2467,78.5398,-294.52,531.78,-460.19,153.40,-9.998*(10**-11)])
+        global ls1_t, ls2_t, as1_t, as2_t, t1_trot, t2_trot, l_down
         l_down = np.linspace(0.135,0.175,nh/4)
         
         ls1_t = np.array([0.165,0,0,-30,225,-562.5,468.75])
         ls2_t = np.array([2.725,-28.8,132,-315,412.5,-281.25,78.125])
         as1_t = np.array([0.1309*2,0,0,-40.91*2,153.3981*2,-153.3981*2,6.67*(10**-12)*2])
         as2_t = np.array([-8.2467*2,78.5398*2,-294.52*2,531.78*2,-460.19*2,153.40*2,-9.998*(10**-11)*2])
-    
-        ls1_t2 = np.array([0.165,0,0,-30,225,-562.5,468.75])
-        ls2_t2 = np.array([2.725,-28.8,132,-315,412.5,-281.25,78.125])
-        as1_t2 = np.array([0.1309*2,0,0,-40.91*2,153.3981*2,-153.3981*2,6.67*(10**-12)*2])
-        as2_t2 = np.array([-8.2467*2,78.5398*2,-294.52*2,531.78*2,-460.19*2,153.40*2,-9.998*(10**-11)*2])
 
-        #ls1_t2 = np.array([0.185,0,0,-40,300,-750,625])
-        #ls2_t2 = np.array([0.185,4.178*(10**-14),-8.69*(10**-14),-4.309*(10**-13),-1.806*(10**-13),-5.214*(10**-14),-2.20*(10**-13)])
-        #as1_t2 = np.array([0.1309,0,0,-40.91,153.3981,-153.3981,6.67*(10**-12)])
-        #as2_t2 = np.array([-8.2467,78.5398,-294.52,531.78,-460.19,153.40,-9.998*(10**-11)])
-        
-        t1 = np.linspace(0,0.2,n/4)
-        t2 = np.linspace(0.2,0.8,3*n/4)
-        
-        t1_trot = np.linspace(0,0.4,n/2)
-        t2_trot = np.linspace(0.4,0.8,n/2)
+        t1_trot = np.linspace(0,t/2,n/2)
+        t2_trot = np.linspace(t/2,t,n/2)
 
         t1_th = np.linspace(0,0.4,nh/2)
         t2_th = np.linspace(0.4,0.8,nh)
-
-        theta1 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
-        theta2 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
 
         theta1f = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
         theta2f = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
@@ -471,92 +443,47 @@ class robot():
         rightshoulder = R.dot(rightshoulder)
         foot = R.dot(foot)
 
-        return [base,leftshoulder,rightshoulder,foot]; 
+        return [base,leftshoulder,rightshoulder,foot];
 
-    def getPath_Walk(self):
-        alpha1 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
-        alpha2 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
+    def setFootTrajectory(self,length,clearance,sweepAngle,secPerCycle):
+        vl1 = clearance*length
+        vl2 = length
+        vl3 = length*0.97
 
-        path1 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
-        path2 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
-
-        alpha_1, alpha_2, alpha_3, alpha_4 = np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float)       
-        l_1, l_2, l_3, l_4 = np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float)
-
-        print('Calculating equations of l and alpha')
-        l1_t = ls1[0]+ls1[1]*t1+ls1[2]*np.power(t1,2)+ls1[3]*np.power(t1,3)+ls1[4]*np.power(t1,4)+ls1[5]*np.power(t1,5)+ls1[6]*np.power(t1,6)
-        l2_t = ls2[0]+ls2[1]*t2+ls2[2]*np.power(t2,2)+ls2[3]*np.power(t2,3)+ls2[4]*np.power(t2,4)+ls2[5]*np.power(t2,5)+ls2[6]*np.power(t2,6)
-
-        a1_t = as1[0]+as1[1]*t1+as1[2]*np.power(t1,2)+as1[3]*np.power(t1,3)+as1[4]*np.power(t1,4)+as1[5]*np.power(t1,5)+as1[6]*np.power(t1,6)
-        a2_t = as2[0]+as2[1]*t2+as2[2]*np.power(t2,2)+as2[3]*np.power(t2,3)+as2[4]*np.power(t2,4)+as2[5]*np.power(t2,5)+as2[6]*np.power(t2,6)
-
-        print('Calculating path of each leg!')
-        print('Length is ',len(t1)+len(t2)-1)
-        for i in range(len(t1)+len(t2)):
-            if (i<n/4):
-                alpha_1[i] = a1_t[i]
-                l_1[i] = l1_t[i]
-                alpha_2[i] = a2_t[i]
-                l_2[i] = l2_t[i]
-                alpha_3[i] = a2_t[int(i+n/4)]
-                l_3[i] = l2_t[int(i+n/4)]
-                alpha_4[i] = a2_t[int(i+n/2)]
-                l_4[i] = l2_t[int(i+n/2)]
-                
-            elif (i<n/2):
-                alpha_1[i] = a2_t[int(i-n/4)]
-                l_1[i] = l2_t[int(i-n/4)]
-                alpha_2[i] = a2_t[i]
-                l_2[i] = l2_t[i]
-                alpha_3[i] = a2_t[int(i+n/4)]
-                l_3[i] = l2_t[int(i+n/4)]
-                alpha_4[i] = a1_t[int(i-n/4)]
-                l_4[i] = l1_t[int(i-n/4)]
-            elif (i<3*n/4):
-                alpha_1[i] = a2_t[int(i-n/4)]
-                l_1[i] = l2_t[int(i-n/4)]
-                alpha_2[i] = a2_t[i]
-                l_2[i] = l2_t[i]
-                alpha_3[i] = a1_t[int(i-n/2)]
-                l_3[i] = l1_t[int(i-n/2)]
-                alpha_4[i] = a2_t[int(i-n/2)]
-                l_4[i] = l2_t[int(i-n/2)]
-            else:
-                alpha_1[i] = a2_t[int(i-n/4)]
-                l_1[i] = l2_t[int(i-n/4)]
-                alpha_2[i] = a1_t[int(i-3*n/4)]
-                l_2[i] = l1_t[int(i-3*n/4)]
-                alpha_3[i] = a2_t[int(i-3*n/4)]
-                l_3[i] = l2_t[int(i-3*n/4)]
-                alpha_4[i] = a2_t[int(i-n/2)]
-                l_4[i] = l2_t[int(i-n/2)]
-            
-            alpha_s = np.array([alpha_1,alpha_2,alpha_3,alpha_4])
-            l_s = np.array([l_1,l_2,l_3,l_4])
-            print('Alphas ',alpha_s[0][i],' ',alpha_s[2][i])
-            #print('L ',l_s)
-            for j in range(4):
-                alpha1[j][i] = (alpha_s[j][i] - math.pi/2)
-                alpha2[j][i] = (math.acos((((globals.l1**2)+((l_s[j][i])**2)-(globals.l2**2))/(2*globals.l1*l_s[j][i]))))
-         
-                self.leftShoulderx[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2)[1][0]) 
-                self.rightShoulderx[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2)[2][0])
-                self.leftShouldery[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2)[1][1]) 
-                self.rightShouldery[j][i] = (self.symmetric(alpha1[j][i],alpha2[j][i],globals.l1,globals.l2)[2][1])
-
-                theta1[j][i] = (math.acos(self.rightShouldery[j][i]/globals.l1))
-                theta2[j][i] = (math.acos(self.leftShouldery[j][i]/globals.l1))
-
-                if(i>n-2):
-                    path1[j] = (self.setAngles(theta1[j]))
-                    path2[j] = (self.setAngles(theta2[j]))
-
-            print('Iteration ',i)
+        t0 = 0
+        t = secPerCycle
+        t1 = t/4
+        t2 = t/2
+        t3 = 3*t/4
         
-        print('Walk Path calculated!')
-        return [theta1,theta2];
+        sweepAngle = math.radians(sweepAngle)
 
+        leng_lhs1 = np.array([vl2,vl2,vl1,0,0,0,0])
+        leng_lhs2 = np.array([vl2,vl2,vl3,0,0,0,0])
 
+        alpha_lhs1 = np.array([sweepAngle,-sweepAngle,0,0,0,0,0])
+        alpha_lhs2 = np.array([-sweepAngle,sweepAngle,0,0,0,0,0])
+
+        leng_rhs1 = np.array([[1,t0,t0**2,t0**3,t0**4,t0**5,t0**6],[1,t2,t2**2,t2**3,t2**4,t2**5,t2**6],[1,t1,t1**2,t1**3,t1**4,t1**5,t1**6],[0,1,2*t0,3*t0**2,4*t0**3,5*t0**4,6*t0**5],[0,1,2*t2,3*t2**2,4*t2**3,5*t2**4,6*t2**5],[0,0,2,6*t0,12*t0**2,20*t0**3,30*t0**4],[0,0,2,6*t2,12*t2**2,20*t2**3,30*t2**4]])
+        leng_rhs2 = np.array([[1,t2,t2**2,t2**3,t2**4,t2**5,t2**6],[1,t,t**2,t**3,t**4,t**5,t**6],[1,t3,t3**2,t3**3,t3**4,t3**5,t3**6],[0,1,2*t2,3*t2**2,4*t2**3,5*t2**4,6*t2**5],[0,1,2*t,3*t**2,4*t**3,5*t**4,6*t**5],[0,0,2,6*t2,12*t2**2,20*t2**3,30*t2**4],[0,0,2,6*t,12*t**2,20*t**3,30*t**4]])
+
+        alpha_rhs1 = leng_rhs1
+        alpha_rhs2 = leng_rhs2
+
+        leng_coeff1 = np.matmul(np.linalg.inv(leng_rhs1),np.transpose(leng_lhs1))
+        leng_coeff2 = np.matmul(np.linalg.inv(leng_rhs2),np.transpose(leng_lhs2))
+
+        alpha_coeff1 = np.matmul(np.linalg.inv(alpha_rhs1),np.transpose(alpha_lhs1))
+        alpha_coeff2 = np.matmul(np.linalg.inv(alpha_rhs2),np.transpose(alpha_lhs2))
+        
+        ls1_t, ls2_t, as1_t, as2_t = leng_coeff1, leng_coeff2, alpha_coeff1, alpha_coeff2
+
+        print(np.transpose(leng_lhs1))
+
+        print('Leng_coeff1 is',leng_coeff1)
+        print('Leng_coeff2 is',leng_coeff2)
+        print('A_coeff1 is',alpha_coeff1)
+        print('A_coeff2 is',alpha_coeff2)
 
     def getPath_Trot(self):
         alpha1 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
@@ -575,22 +502,16 @@ class robot():
         a1_t = as1_t[0]+as1_t[1]*t1_trot+as1_t[2]*np.power(t1_trot,2)+as1_t[3]*np.power(t1_trot,3)+as1_t[4]*np.power(t1_trot,4)+as1_t[5]*np.power(t1_trot,5)+as1_t[6]*np.power(t1_trot,6)
         a2_t = as2_t[0]+as2_t[1]*t2_trot+as2_t[2]*np.power(t2_trot,2)+as2_t[3]*np.power(t2_trot,3)+as2_t[4]*np.power(t2_trot,4)+as2_t[5]*np.power(t2_trot,5)+as2_t[6]*np.power(t2_trot,6)
 
-        l1_t2 = ls1_t2[0]+ls1_t2[1]*t1_trot+ls1_t2[2]*np.power(t1_trot,2)+ls1_t2[3]*np.power(t1_trot,3)+ls1_t2[4]*np.power(t1_trot,4)+ls1_t2[5]*np.power(t1_trot,5)+ls1_t2[6]*np.power(t1_trot,6)
-        l2_t2 = ls2_t2[0]+ls2_t2[1]*t2_trot+ls2_t2[2]*np.power(t2_trot,2)+ls2_t2[3]*np.power(t2_trot,3)+ls2_t2[4]*np.power(t2_trot,4)+ls2_t2[5]*np.power(t2_trot,5)+ls2_t2[6]*np.power(t2_trot,6)
-
-        a1_t2 = as1_t2[0]+as1_t2[1]*t1_trot+as1_t2[2]*np.power(t1_trot,2)+as1_t2[3]*np.power(t1_trot,3)+as1_t2[4]*np.power(t1_trot,4)+as1_t2[5]*np.power(t1_trot,5)+as1_t2[6]*np.power(t1_trot,6)
-        a2_t2 = as2_t2[0]+as2_t2[1]*t2_trot+as2_t2[2]*np.power(t2_trot,2)+as2_t2[3]*np.power(t2_trot,3)+as2_t2[4]*np.power(t2_trot,4)+as2_t2[5]*np.power(t2_trot,5)+as2_t2[6]*np.power(t2_trot,6)
-
         print('Calculating path of each leg!')
         print('Length is ',len(t1_trot)+len(t2_trot)-1)
         for i in range(n):
             if (i<n/2):
                 alpha_1[i] = a1_t[i]
                 l_1[i] = l1_t[i]
-                alpha_2[i] = a2_t2[i]
-                l_2[i] = l2_t2[i]
-                alpha_3[i] = a1_t2[i]
-                l_3[i] = l1_t2[i]
+                alpha_2[i] = a2_t[i]
+                l_2[i] = l2_t[i]
+                alpha_3[i] = a1_t[i]
+                l_3[i] = l1_t[i]
                 alpha_4[i] = a2_t[i]
                 l_4[i] = l2_t[i]
                 
@@ -598,10 +519,10 @@ class robot():
             else:
                 alpha_1[i] = a2_t[int(i-n/2)]
                 l_1[i] = l2_t[int(i-n/2)]
-                alpha_2[i] = a1_t2[int(i-n/2)]
-                l_2[i] = l1_t2[int(i-n/2)]
-                alpha_3[i] = a2_t2[int(i-n/2)]
-                l_3[i] = l2_t2[int(i-n/2)]
+                alpha_2[i] = a1_t[int(i-n/2)]
+                l_2[i] = l1_t[int(i-n/2)]
+                alpha_3[i] = a2_t[int(i-n/2)]
+                l_3[i] = l2_t[int(i-n/2)]
                 alpha_4[i] = a1_t[int(i-n/2)]
                 l_4[i] = l1_t[int(i-n/2)]
             
@@ -621,10 +542,6 @@ class robot():
 
                 theta1_t[j][i] = (math.acos(self.rightShouldery[j][i]/globals.l1))
                 theta2_t[j][i] = (math.acos(self.leftShouldery[j][i]/globals.l1))
-
-                if(i>n-2):
-                    path1[j] = (self.setAngles(theta1[j]))
-                    path2[j] = (self.setAngles(theta2[j]))
 
             print('Iteration ',i)
         

@@ -24,6 +24,8 @@ lilbro.findDrivers('388937803437','2061376D3548','206A3379304B','385337753437')
 
 print('Drivers found',lilbro.getDriver1(),' ',lilbro.getDriver2(),' ',lilbro.getDriver3(),' ',lilbro.getDriver4())
 
+lilbro.setFootTrajectory(0.165,0.135/0.165,15,0.4)
+
 alpha2 = []
 legParms = []
 alpha2m = []
@@ -43,13 +45,17 @@ theta1m = []
 theta2m = []
 theta1_s = []
 theta2_s = []
-n = 24
+n = 12
 nh = 7
 
+posGain = 85
+velGain = 0.00055
+velIntGain = 0.5*100*velGain
+
 lilbro.setStates(1)
-lilbro.setPGains(75)
-lilbro.setVelGains(0.001057)
-lilbro.setVelIntGains(0)
+lilbro.setPGains(posGain)
+lilbro.setVelGains(velGain)
+lilbro.setVelIntGains(velIntGain)
 lilbro.setTrajAll(150000,105000,105000,0)
 lilbro.setVelLims(200000)
 
@@ -435,7 +441,7 @@ for k in range(len(l_squat)):
     theta1_s.append(math.atan2(-legParms_s[k][1][0],legParms_s[k][1][1]))
     theta2_s.append(math.atan2(legParms_s[k][2][0],legParms_s[k][2][1]))
 
-offset = [29,16,64.5,40.5,61,14.5,78,54]
+offset = [31,18,64.5,40.5,61,14.5,80,56]
 
 stalpha2 = math.acos((((l1**2)+((0.17**2)-(l2**2))/(2*l1*0.17))))
 stlegParms = lilbro.symmetric(-math.pi/2,stalpha2,l1,l2)
@@ -766,7 +772,7 @@ while True:
                          if(lock == 0):
                              print(lilbro.getCurrents())
 
-                         time_.sleep(0.0005)
+                         time_.sleep(0.02)
 
                 elif(walking < -0.5):
                     for i in range(n):
@@ -801,7 +807,7 @@ while True:
                          if(lock == 0):
                              print(lilbro.getCurrents())
 
-                         time_.sleep(0.0005)
+                         time_.sleep(0.02)
 
                 else: 
                     lilbro.driver1.axis0.controller.move_to_pos(lilbro.toMotor(lilbro.toCount(-50+offset[0])))
