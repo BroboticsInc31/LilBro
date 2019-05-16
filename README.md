@@ -4,7 +4,7 @@ Lil'Bro is a 3D printed, open source quadrupedal robot which allows researchers 
 
 
 Dependencies: 
-ODrive - https://docs.odriverobotics.com/ \n
+ODrive - https://docs.odriverobotics.com/ </br>
 Numpy - https://www.numpy.org/
 
 Clone/Download the repository.
