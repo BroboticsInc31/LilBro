@@ -10,8 +10,12 @@ Numpy - https://www.numpy.org/</br></br>
 Clone/Download the repository.</br>
 
 In directory from the terminal run:</br>
-    "sudo python3 main.py" </br>
-    (without the "")</br></br>
+   '''
+   sudo python3 main.py 
+   '''
+   </br>
+   
+</br></br>
 
   
 
