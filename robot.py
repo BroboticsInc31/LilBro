@@ -93,14 +93,9 @@ class robot():
 
         global theta1_t, theta2_t, theta1_ht, theta2_ht, t1_th, t2_th, theta1f, theta2f, theta1_b, theta2_b
 
-        global ls1_t, ls2_t, as1_t, as2_t, t1_trot, t2_trot, l_down
+        global ls1_t, ls2_t, as1_t, as2_t, ls1_tBack, ls2_tBack, as1_tBack, as2_tBack, t1_trot, t2_trot, l_down
         l_down = np.linspace(0.135,0.175,nh/4)
         
-        ls1_t = np.array([0.165,0,0,-30,225,-562.5,468.75])
-        ls2_t = np.array([2.725,-28.8,132,-315,412.5,-281.25,78.125])
-        as1_t = np.array([0.1309*2,0,0,-40.91*2,153.3981*2,-153.3981*2,6.67*(10**-12)*2])
-        as2_t = np.array([-8.2467*2,78.5398*2,-294.52*2,531.78*2,-460.19*2,153.40*2,-9.998*(10**-11)*2])
-
         t1_trot = np.linspace(0,t/2,n/2)
         t2_trot = np.linspace(t/2,t,n/2)
 
@@ -445,7 +440,7 @@ class robot():
 
         return [base,leftshoulder,rightshoulder,foot];
 
-    def setFootTrajectory(self,length,clearance,sweepAngle,secPerCycle):
+    def setFootTrajectory(self,length,clearance,sweepAngle,secPerCycle,frontOrBack):
         vl1 = clearance*length
         vl2 = length
         vl3 = length*0.97
@@ -475,15 +470,12 @@ class robot():
 
         alpha_coeff1 = np.matmul(np.linalg.inv(alpha_rhs1),np.transpose(alpha_lhs1))
         alpha_coeff2 = np.matmul(np.linalg.inv(alpha_rhs2),np.transpose(alpha_lhs2))
-        
-        ls1_t, ls2_t, as1_t, as2_t = leng_coeff1, leng_coeff2, alpha_coeff1, alpha_coeff2
 
-        print(np.transpose(leng_lhs1))
+        if(frontOrBack==1):
+            ls1_t, ls2_t, as1_t, as2_t = leng_coeff1, leng_coeff2, alpha_coeff1, alpha_coeff2
+        else:
+            ls1_tBack, ls2_tBack, as1_tBack, as2_tBack = leng_coeff1, leng_coeff2, alpha_coeff1, alpha_coeff2
 
-        print('Leng_coeff1 is',leng_coeff1)
-        print('Leng_coeff2 is',leng_coeff2)
-        print('A_coeff1 is',alpha_coeff1)
-        print('A_coeff2 is',alpha_coeff2)
 
     def getPath_Trot(self):
         alpha1 = np.array([np.zeros(n),np.zeros(n),np.zeros(n),np.zeros(n)])
@@ -496,11 +488,20 @@ class robot():
         l_1, l_2, l_3, l_4 = np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float), np.zeros(n,dtype=float)
 
         print('Calculating equations of l and alpha')
+
+        # For the front legs
         l1_t = ls1_t[0]+ls1_t[1]*t1_trot+ls1_t[2]*np.power(t1_trot,2)+ls1_t[3]*np.power(t1_trot,3)+ls1_t[4]*np.power(t1_trot,4)+ls1_t[5]*np.power(t1_trot,5)+ls1_t[6]*np.power(t1_trot,6)
         l2_t = ls2_t[0]+ls2_t[1]*t2_trot+ls2_t[2]*np.power(t2_trot,2)+ls2_t[3]*np.power(t2_trot,3)+ls2_t[4]*np.power(t2_trot,4)+ls2_t[5]*np.power(t2_trot,5)+ls2_t[6]*np.power(t2_trot,6)
 
         a1_t = as1_t[0]+as1_t[1]*t1_trot+as1_t[2]*np.power(t1_trot,2)+as1_t[3]*np.power(t1_trot,3)+as1_t[4]*np.power(t1_trot,4)+as1_t[5]*np.power(t1_trot,5)+as1_t[6]*np.power(t1_trot,6)
         a2_t = as2_t[0]+as2_t[1]*t2_trot+as2_t[2]*np.power(t2_trot,2)+as2_t[3]*np.power(t2_trot,3)+as2_t[4]*np.power(t2_trot,4)+as2_t[5]*np.power(t2_trot,5)+as2_t[6]*np.power(t2_trot,6)
+
+        # For the back legs
+        l1_tBack = ls1_tBack[0]+ls1_tBack[1]*t1_trot+ls1_tBack[2]*np.power(t1_trot,2)+ls1_tBack[3]*np.power(t1_trot,3)+ls1_tBack[4]*np.power(t1_trot,4)+ls1_tBack[5]*np.power(t1_trot,5)+ls1_tBack[6]*np.power(t1_trot,6)
+        l2_tBack = ls2_tBack[0]+ls2_tBack[1]*t2_trot+ls2_tBack[2]*np.power(t2_trot,2)+ls2_tBack[3]*np.power(t2_trot,3)+ls2_tBack[4]*np.power(t2_trot,4)+ls2_tBack[5]*np.power(t2_trot,5)+ls2_tBack[6]*np.power(t2_trot,6)
+
+        a1_tBack = as1_tBack[0]+as1_tBack[1]*t1_trot+as1_tBack[2]*np.power(t1_trot,2)+as1_tBack[3]*np.power(t1_trot,3)+as1_tBack[4]*np.power(t1_trot,4)+as1_tBack[5]*np.power(t1_trot,5)+as1_tBack[6]*np.power(t1_trot,6)
+        a2_tBack = as2_tBack[0]+as2_tBack[1]*t2_trot+as2_tBack[2]*np.power(t2_trot,2)+as2_tBack[3]*np.power(t2_trot,3)+as2_tBack[4]*np.power(t2_trot,4)+as2_tBack[5]*np.power(t2_trot,5)+as2_tBack[6]*np.power(t2_trot,6)
 
         print('Calculating path of each leg!')
         print('Length is ',len(t1_trot)+len(t2_trot)-1)
@@ -508,10 +509,10 @@ class robot():
             if (i<n/2):
                 alpha_1[i] = a1_t[i]
                 l_1[i] = l1_t[i]
-                alpha_2[i] = a2_t[i]
-                l_2[i] = l2_t[i]
-                alpha_3[i] = a1_t[i]
-                l_3[i] = l1_t[i]
+                alpha_2[i] = a2_tBack[i]
+                l_2[i] = l2_tBack[i]
+                alpha_3[i] = a1_tBack[i]
+                l_3[i] = l1_tBack[i]
                 alpha_4[i] = a2_t[i]
                 l_4[i] = l2_t[i]
                 
@@ -519,10 +520,10 @@ class robot():
             else:
                 alpha_1[i] = a2_t[int(i-n/2)]
                 l_1[i] = l2_t[int(i-n/2)]
-                alpha_2[i] = a1_t[int(i-n/2)]
-                l_2[i] = l1_t[int(i-n/2)]
-                alpha_3[i] = a2_t[int(i-n/2)]
-                l_3[i] = l2_t[int(i-n/2)]
+                alpha_2[i] = a1_tBack[int(i-n/2)]
+                l_2[i] = l1_tBack[int(i-n/2)]
+                alpha_3[i] = a2_tBack[int(i-n/2)]
+                l_3[i] = l2_tBack[int(i-n/2)]
                 alpha_4[i] = a1_t[int(i-n/2)]
                 l_4[i] = l1_t[int(i-n/2)]
             
@@ -549,8 +550,6 @@ class robot():
         print(theta1_t)
         print(theta2_t)
         return [theta1_t,theta2_t];
-
-
 
 
     def getPath_halfTrot(self):

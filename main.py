@@ -24,7 +24,8 @@ lilbro.findDrivers('388937803437','2061376D3548','206A3379304B','385337753437')
 
 print('Drivers found',lilbro.getDriver1(),' ',lilbro.getDriver2(),' ',lilbro.getDriver3(),' ',lilbro.getDriver4())
 
-lilbro.setFootTrajectory(0.165,0.135/0.165,15,0.4)
+lilbro.setFootTrajectory(0.165,0.135/0.165,15,0.4,1)
+lilbro.setFootTrajectory(0.165,0.135/0.165,15,0.4,2)
 
 alpha2 = []
 legParms = []
