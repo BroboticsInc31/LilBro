@@ -7,8 +7,7 @@ Install Dependencies: </br>
 ODrive - https://docs.odriverobotics.com/ </br>
 Numpy - https://www.numpy.org/</br></br>
 
-Clone/Download the repository.</br>
-
+Download the repository.</br>
 In directory from the terminal run:</br>
    ```
    sudo python3 main.py 
