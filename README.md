@@ -8,7 +8,7 @@ ODrive - https://docs.odriverobotics.com/ </br>
 Numpy - https://www.numpy.org/</br></br>
 
 Download the repository.</br>
-In directory from the terminal run:</br>
+in directory (where repository was downloaded) run:</br>
    ```
    sudo python3 main.py 
    ```
