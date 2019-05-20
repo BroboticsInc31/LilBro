@@ -2,6 +2,12 @@
 
 Lil'Bro is a 3D printed, open source quadrupedal robot which allows researchers to investigate agile gait locomotion and may duplicate, modify, and create new methods for the robot. 
 
+Related Videos: </br>
+Calibration - https://youtu.be/Aq8ONlaq-m4 </br>
+Startup routine - https://youtu.be/N4R1693wzeQ </br>
+Charging Batteries - https://youtu.be/PBRBTcRp_1k </br>
+Using the power supply - https://youtu.be/rCxc9LMYpuw </br>
+
 
 Install Dependencies: </br>
 ODrive - https://docs.odriverobotics.com/ </br>
